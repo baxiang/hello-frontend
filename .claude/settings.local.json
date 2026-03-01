@@ -11,7 +11,10 @@
       "Bash(git -C /Users/baxiang/Documents/hello-frontend log --oneline -5)",
       "Bash(git -C /Users/baxiang/Documents/hello-frontend remote:*)",
       "Bash(git -C /Users/baxiang/Documents/hello-frontend add .)",
-      "Bash(git -C /Users/baxiang/Documents/hello-frontend commit:*)"
+      "Bash(git -C /Users/baxiang/Documents/hello-frontend commit:*)",
+      "Bash(git -C /Users/baxiang/Documents/hello-frontend push:*)",
+      "Bash(git -C /Users/baxiang/Documents/hello-frontend add CLAUDE.md)",
+      "Bash(git -C /Users/baxiang/Documents/hello-frontend status)"
     ]
   }
 }
