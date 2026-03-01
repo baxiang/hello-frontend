@@ -8,14 +8,14 @@
 
 | 序号 | 模块 | 内容 | 进度 |
 |------|------|------|------|
-| 01 | [HTML5](./01-html5/) | 基础语法、表单、语义化标签、多媒体 | 📖 |
-| 02 | [CSS3](./02-css3/) | 选择器、布局、动画、响应式设计 | ✅ |
-| 03 | [JavaScript](./03-javascript/) | 核心语法、DOM、异步编程 | 📖 |
-| 04 | [ES6+](./04-es6/) | 现代 JavaScript 特性 | 📖 |
-| 05 | [TypeScript](./05-typescript/) | 类型系统、接口、泛型 | 📖 |
-| 06 | [Node.js](./06-nodejs/) | 服务端开发、Express、数据库 | 📖 |
-| 07 | [工程化](./07-engineering/) | 构建工具、代码规范、测试 | 📖 |
-| 08 | [框架](./08-frameworks/) | React、Vue、状态管理 | 📖 |
+| 01 | [HTML5](./01-html5/) | 基础语法、表单、语义化标签 | ✅ |
+| 02 | [CSS3](./02-css3/) | 选择器、布局、动画、响应式 | ✅ |
+| 03 | [JavaScript](./03-javascript/) | 核心语法、DOM、异步、高级特性 | ✅ |
+| 04 | [ES6+](./04-es6/) | 现代 JavaScript 特性 | ✅ |
+| 05 | [TypeScript](./05-typescript/) | 类型系统、接口、泛型 | ✅ |
+| 06 | [Node.js](./06-nodejs/) | 服务端开发、Express、数据库 | ✅ |
+| 07 | [工程化](./07-engineering/) | Webpack、Vite、ESLint、测试 | ✅ |
+| 08 | [框架](./08-frameworks/) | React、Vue、路由、状态管理 | ✅ |
 
 ---
 
@@ -116,7 +116,7 @@
 
 | 日期 | 内容 |
 |------|------|
-| 2026-03-01 | 创建学习路线框架，完成 HTML5 和 CSS3 模块 |
+| 2026-03-01 | 完成全部 8 个模块，涵盖前端完整技术栈 |
 
 ---
 
@@ -136,3 +136,24 @@
 - [02-布局相关.md](./02-css3/02-布局相关.md) - Flexbox、Grid、Position 定位
 - [03-动画与过渡.md](./02-css3/03-动画与过渡.md) - Transition、Animation、Transform
 - [04-响应式设计.md](./02-css3/04-响应式设计.md) - 媒体查询、移动优先、响应式布局
+
+### 03-javascript/
+- [01-核心语法.md](./03-javascript/01-核心语法.md) - 变量、数据类型、函数、对象、数组
+- [02-DOM 操作.md](./03-javascript/02-DOM 操作.md) - 元素选择、事件处理、表单操作
+- [03-异步编程.md](./03-javascript/03-异步编程.md) - Promise、async/await、Fetch API
+- [04-高级特性.md](./03-javascript/04-高级特性.md) - 闭包、this、原型链、ES6+、函数式编程
+
+### 04-es6+/
+- [01-ES6+ 新特性.md](./04-es6+/01-ES6+ 新特性.md) - let/const、箭头函数、解构、class、模块化
+
+### 05-typescript/
+- [01-TypeScript 基础.md](./05-typescript/01-TypeScript 基础.md) - 类型系统、接口、泛型、高级类型
+
+### 06-nodejs/
+- [01-Node.js 基础.md](./06-nodejs/01-Node.js 基础.md) - 模块系统、HTTP、Express、数据库、认证
+
+### 07-engineering/
+- [01-前端工程化.md](./07-engineering/01-前端工程化.md) - npm、Webpack、Vite、ESLint、Prettier、Vitest
+
+### 08-frameworks/
+- [01-前端框架.md](./08-frameworks/01-前端框架.md) - React、Vue、Router、Redux、Pinia
