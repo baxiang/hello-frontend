@@ -175,7 +175,9 @@
 - [06-项目实战](./06-nodejs/06-项目实战.md) - 博客 API、完整项目实战
 
 ### 07-engineering/
-- [01-前端工程化.md](./07-engineering/01-前端工程化.md) - npm、Webpack、Vite、ESLint、Prettier、Vitest
+- [README.md](./07-engineering/README.md) - 学习路线
+- [01-前端工程化.md](./07-engineering/01-前端工程化.md) - npm/yarn/pnpm、Webpack、Vite、ESLint、Prettier、Vitest、Husky
 
 ### 08-frameworks/
-- [01-前端框架.md](./08-frameworks/01-前端框架.md) - React、Vue、Router、Redux、Pinia
+- [README.md](./08-frameworks/README.md) - 学习路线
+- [01-前端框架.md](./08-frameworks/01-前端框架.md) - React 基础、Vue 基础、Router、状态管理（Redux/Pinia）
