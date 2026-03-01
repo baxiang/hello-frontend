@@ -144,10 +144,20 @@
 - [04-高级特性.md](./03-javascript/04-高级特性.md) - 闭包、this、原型链、ES6+、函数式编程
 
 ### 04-es6+/
-- [01-ES6+ 新特性.md](./04-es6+/01-ES6+ 新特性.md) - let/const、箭头函数、解构、class、模块化
+- [README.md](./04-es6+/README.md) - 学习路线
+- [01-let/const 与作用域](./04-es6+/01-let-const 作用域.md) - 块级作用域、暂时性死区
+- [02-箭头函数](./04-es6+/02-箭头函数.md) - 语法、this 绑定
+- [03-解构与展开](./04-es6+/03-解构与展开.md) - 数组/对象解构、展开运算符
+- [04-模板字符串-Symbol](./04-es6+/04-模板字符串-Symbol.md) - 模板字符串、Symbol 类型
+- [05-Map-Set](./04-es6+/05-Map-Set.md) -  Map、Set、WeakMap、WeakSet
+- [06-Class 类](./04-es6+/06-Class 类.md) - class、继承、私有字段
+- [07-模块化](./04-es6+/07-模块化.md) - import/export、动态导入
+- [08-Promise-async](./04-es6+/08-Promise-async.md) - Promise、async/await
+- [09-ES2017-2022](./04-es6+/09-ES2017-2022.md) - 历年新特性
 
 ### 05-typescript/
-- [01-TypeScript 基础.md](./05-typescript/01-TypeScript 基础.md) - 类型系统、接口、泛型、高级类型
+- [README.md](./05-typescript/README.md) - 学习路线
+- [01-基础类型](./05-typescript/01-基础类型.md) - 基础类型、类型推断、类型断言
 
 ### 06-nodejs/
 - [01-Node.js 基础.md](./06-nodejs/01-Node.js 基础.md) - 模块系统、HTTP、Express、数据库、认证
