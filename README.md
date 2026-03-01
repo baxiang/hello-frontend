@@ -165,7 +165,13 @@
 - [06-装饰器](./05-typescript/06-装饰器.md) - 类装饰器、方法装饰器、属性装饰器、参数装饰器（选学）
 
 ### 06-nodejs/
-- [01-Node.js 基础.md](./06-nodejs/01-Node.js 基础.md) - 模块系统、HTTP、Express、数据库、认证
+- [README.md](./06-nodejs/README.md) - 学习路线
+- [01-Node.js 基础](./06-nodejs/01-Node.js 基础.md) - Node.js 简介、模块系统、核心模块
+- [02-HTTP 与 Web 开发](./06-nodejs/02-HTTP 与 Web 开发.md) - HTTP 服务器、Express、路由、中间件、RESTful API
+- [03-数据库集成](./06-nodejs/03-数据库集成.md) - MongoDB、Mongoose、MySQL
+- [04-用户认证与安全](./06-nodejs/04-用户认证与安全.md) - JWT、bcrypt、认证中间件、安全实践
+- [05-实用技术](./06-nodejs/05-实用技术.md) - 文件上传、日志、错误处理、环境变量
+- [06-项目实战](./06-nodejs/06-项目实战.md) - 博客 API、完整项目实战
 
 ### 07-engineering/
 - [01-前端工程化.md](./07-engineering/01-前端工程化.md) - npm、Webpack、Vite、ESLint、Prettier、Vitest
