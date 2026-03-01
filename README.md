@@ -138,10 +138,11 @@
 - [04-响应式设计.md](./02-css3/04-响应式设计.md) - 媒体查询、移动优先、响应式布局
 
 ### 03-javascript/
+- [README.md](./03-javascript/README.md) - 学习路线
 - [01-核心语法.md](./03-javascript/01-核心语法.md) - 变量、数据类型、函数、对象、数组
-- [02-DOM 操作.md](./03-javascript/02-DOM 操作.md) - 元素选择、事件处理、表单操作
-- [03-异步编程.md](./03-javascript/03-异步编程.md) - Promise、async/await、Fetch API
-- [04-高级特性.md](./03-javascript/04-高级特性.md) - 闭包、this、原型链、ES6+、函数式编程
+- [02-DOM 操作.md](./03-javascript/02-DOM 操作.md) - 元素选择、事件处理、表单操作、事件委托
+- [03-异步编程.md](./03-javascript/03-异步编程.md) - 事件循环、Promise、async/await、Fetch API
+- [04-高级特性.md](./03-javascript/04-高级特性.md) - 闭包、this、原型链、函数式编程
 
 ### 04-es6+/
 - [README.md](./04-es6+/README.md) - 学习路线
@@ -149,7 +150,7 @@
 - [02-箭头函数](./04-es6+/02-箭头函数.md) - 语法、this 绑定
 - [03-解构与展开](./04-es6+/03-解构与展开.md) - 数组/对象解构、展开运算符
 - [04-模板字符串-Symbol](./04-es6+/04-模板字符串-Symbol.md) - 模板字符串、Symbol 类型
-- [05-Map-Set](./04-es6+/05-Map-Set.md) -  Map、Set、WeakMap、WeakSet
+- [05-Map-Set](./04-es6+/05-Map-Set.md) - Map、Set、WeakMap、WeakSet
 - [06-Class 类](./04-es6+/06-Class 类.md) - class、继承、私有字段
 - [07-模块化](./04-es6+/07-模块化.md) - import/export、动态导入
 - [08-Promise-async](./04-es6+/08-Promise-async.md) - Promise、async/await
