@@ -562,5 +562,5 @@ console.log(arr.first()); // 1
 
 ---
 
-**上一章：** [← 05-Map 与 Set](./05-Map-Set.md)
-**下一章：** [→ 07-模块化](./07-模块化.md)
+**上一章：** [← 07-函数进阶](./07-函数进阶.md)
+**下一章：** [→ 09-Promise 与 async/await](./09-Promise-async-await.md)

@@ -468,4 +468,4 @@ console.log(obj[symbols[0]]);  // 'value'
 ---
 
 **上一章：** [← 03-解构与展开](./03-解构与展开.md)
-**下一章：** [→ 05-Map 与 Set](./05-Map-Set.md)
+**下一章：** [→ 05-Map-Set-WeakMap](./05-Map-Set-WeakMap.md)
