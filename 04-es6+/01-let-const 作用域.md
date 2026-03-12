@@ -221,7 +221,7 @@ if (condition) {
     let data = fetchDataB();
     processData(data);
 }
-// 两个 data 互不干扰
+// 两个 data 互不干扰dj
 ```
 
 ---
@@ -240,7 +240,9 @@ console.log(b);  // undefined（变量提升）
 var b = 1;
 ```
 
-### TDZ 范围
+### TDZ 范围≥ ≤011001\\\
++-`
+365
 
 ```javascript
 // TDZ 从块开始到变量声明

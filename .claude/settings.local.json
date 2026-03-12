@@ -14,7 +14,9 @@
       "Bash(git -C /Users/baxiang/Documents/hello-frontend commit:*)",
       "Bash(git -C /Users/baxiang/Documents/hello-frontend push:*)",
       "Bash(git -C /Users/baxiang/Documents/hello-frontend add CLAUDE.md)",
-      "Bash(git -C /Users/baxiang/Documents/hello-frontend status)"
+      "Bash(git -C /Users/baxiang/Documents/hello-frontend status)",
+      "Bash(ls:*)",
+      "Bash(done)"
     ]
   }
 }
