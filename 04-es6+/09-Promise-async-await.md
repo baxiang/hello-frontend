@@ -764,6 +764,95 @@ async function getData() {
 }
 ```
 
+### 7. 详细解释 Promise.all
+
+```javascript
+const promises = urls.map(url => fetch(url));
+const results = await Promise.all(promises);
+```
+
+**第一步：urls.map()**
+
+```javascript
+// urls 是数组
+const urls = ['/api/user', '/api/posts', '/api/comments'];
+
+// urls.map() 遍历每个 URL
+const promises = urls.map(url => fetch(url));
+//              │              │
+//              │              └── 对每个 URL 执行 fetch
+//              └── map 返回新数组
+
+// 展开：
+// promises = [
+//     fetch('/api/user'),    // Promise<Response>
+//     fetch('/api/posts'),    // Promise<Response>
+//     fetch('/api/comments') // Promise<Response>
+// ]
+
+// 类型：
+// Promise<Response>[]
+// 即：Promise<Response> 类型的数组
+```
+
+**第二步：Promise.all()**
+
+```javascript
+// Promise.all 接收 Promise 数组
+Promise.all(promises)
+//  │          │
+//  │          └── Promise<Response>[]（Promise 数组）
+//  └── 返回 Promise<Response[]>（所有结果组成的数组）
+
+// 等待所有 Promise 完成
+const results = await Promise.all(promises);
+// results 的类型：Response[]
+// 即：Response 对象的数组
+```
+
+**完整类型标注：**
+
+```javascript
+// 完整写法
+const urls: string[] = ['/api/user', '/api/posts'];
+
+// 1. map 返回 Promise<Response>[]
+const promises: Promise<Response>[] = urls.map((url: string) => fetch(url));
+
+// 2. Promise.all 返回 Promise<Response[]>
+const results: Response[] = await Promise.all(promises);
+```
+
+**流程图：**
+
+```
+urls = ['/api/user', '/api/posts']
+           │
+           ▼ map
+[fetch('/api/user'), fetch('/api/posts')]
+           │
+           │ 同时发起请求（并行！）
+           ▼
+[Promise<Response>, Promise<Response>]
+           │
+           ▼ Promise.all 等待
+[Response, Response]
+```
+
+**对比：串行 vs 并行**
+
+```javascript
+// 串行：2秒（1秒 + 1秒）
+const user = await fetch('/api/user');   // 1秒
+const posts = await fetch('/api/posts');  // 再1秒
+
+// 并行：1秒（同时）
+const [user, posts] = await Promise.all([
+    fetch('/api/user'),   // 同时发起
+    fetch('/api/posts')   // 同时发起
+]);
+```
+
 ---
 
 ### 7. 一句话总结
