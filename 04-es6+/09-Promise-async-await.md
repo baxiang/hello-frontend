@@ -38,42 +38,133 @@ Promise = "承诺" = 未来的结果
 └─────────────────────────────────────────┘
 ```
 
-### 1. setTimeout 是什么？
+### 1. setTimeout 的参数类型
 
+```javascript
+setTimeout(函数, 时间);
 ```
-setTimeout = "定时器" = "延迟执行"
 
-就像：
-- 定一个闹钟
-- 过了指定时间后，执行某个操作
+**setTimeout 接收两个参数：**
+
+| 参数 | 类型 | 说明 |
+|------|------|------|
+| 第1个 | `function` | 延迟后要执行的函数 |
+| 第2个 | `number` | 延迟时间（毫秒） |
+
+**具体类型：**
+
+```javascript
+// setTimeout 的类型定义：
+// setTimeout(callback: () => void, delay: number): number
+
+setTimeout(() => {
+    // 这里的 () => {} 是 function 类型
+    console.log('执行了');
+}, 1000);
+//        │       │
+//        │       └── number 类型
+//        └── function 类型
 ```
+
+**详细拆解：**
+
+```javascript
+// 第一个参数：function（函数）
+// 可以是：
+() => { }                    // 无参数函数
+(a) => { }                   // 1个参数函数
+(a, b) => { }                // 2个参数函数
+
+// 第二个参数：number（数字）
+// 必须是数字，单位是毫秒
+1000    // 1秒
+2000    // 2秒
+500     // 0.5秒
+```
+
+**完整例子：**
+
+```javascript
+// setTimeout(函数, 时间)
+setTimeout(() => console.log('Hello'), 1000);
+//          │              │
+//          │              └── 第二个参数：number（毫秒）
+//          └── 第一个参数：function（箭头函数）
+```
+
+---
+
+### 2. Promise 的参数类型
+
+```javascript
+new Promise((resolve, reject) => {
+    //           │        │
+    //           │        └── reject: (reason?: any) => void
+    //           └── resolve: (value?: any) => void
+});
+```
+
+**Promise 构造函数接收一个函数作为参数：**
+
+```javascript
+// Promise 的类型定义：
+// new Promise(executor: (resolve, reject) => void)
+
+// executor 是一个函数，接收两个参数：
+// - resolve: (value?: any) => void
+// - reject: (reason?: any) => void
+```
+
+**resolve 的类型：**
+
+```javascript
+// resolve 是一个函数，类型是：
+(value?: any) => void
+
+// 参数可以是任意类型：
+resolve('成功');           // 传字符串
+resolve(123);             // 传数字
+resolve({ ok: true });    // 传对象
+resolve([1, 2, 3]);      // 传数组
+```
+
+**reject 的类型：**
+
+```javascript
+// reject 是一个函数，类型是：
+(reason?: any) => void
+
+// 通常传 Error 对象：
+reject(new Error('失败原因'));
+reject('失败原因');  // 也可以传字符串
+```
+
+**完整类型标注：**
 
 ```javascript
 // 完整写法
-setTimeout(() => {
-    console.log('1秒后执行');
-}, 1000);  // 1000 毫秒 = 1秒
+const promise = new Promise<any>((resolve: (value: any) => void, reject: (reason?: any) => void) => {
+    // resolve 的类型：(value: any) => void
+    // reject 的类型：(reason?: any) => void
+    
+    resolve('成功');  // resolve 接收 any 类型
+    reject(new Error('失败'));  // reject 接收 any 类型
+});
 ```
 
-**拆解：**
-```javascript
-setTimeout(函数, 时间);
-//      │       │
-//      │       └── 延迟时间（毫秒）
-//      └── 延迟后要执行的代码
-```
+**简化理解：**
 
-**例子：**
 ```javascript
-// 1秒后打印 Hello
-setTimeout(() => {
-    console.log('Hello');
-}, 1000);
-
-// 2秒后打印 World
-setTimeout(() => {
-    console.log('World');
-}, 2000);
+new Promise((resolve, reject) => {
+    // resolve = (value) => {}  ← 一个接收值的函数
+    // reject = (error) => {}   ← 一个接收错误的函数
+    
+    // 调用 resolve，传递成功的结果
+    resolve('操作成功');
+    
+    // 或者调用 reject，传递失败的原因
+    reject(new Error('操作失败'));
+});
 ```
 
 ---
