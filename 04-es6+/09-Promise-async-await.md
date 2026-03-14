@@ -488,69 +488,289 @@ Promise.any([
 
 ---
 
-## 8.3 async/await
+## 8.3 async/await（通俗理解）
 
-### 基础语法
+### 什么是 async/await？
+
+```
+async = "异步" = 让函数变成异步函数
+await = "等待" = 等待 Promise 完成
+```
+
+**简单理解：**
+- async 修饰的函数自动返回 Promise
+- await 等待 Promise 结果
+
+---
+
+### 1. async 的类型
 
 ```javascript
-// async 函数总是返回 Promise
-async function getData() {
+// async 函数的类型
+async function getData(): Promise<string> {
     return '数据';
-    // 等价于 return Promise.resolve('数据');
+    // 自动包装成 Promise.resolve('数据')
 }
 
-// await 只能在 async 函数中使用
-async function fetchUser(id) {
+// 等价于
+function getData(): Promise<string> {
+    return Promise.resolve('数据');
+}
+```
+
+**async 函数返回类型：**
+
+```javascript
+// 返回字符串 → Promise<string>
+async function fn1(): Promise<string> {
+    return 'hello';
+}
+
+// 返回数字 → Promise<number>
+async function fn2(): Promise<number> {
+    return 123;
+}
+
+// 返回对象 → Promise<{ id: number }>
+async function fn3(): Promise<{ id: number }> {
+    return { id: 1 };
+}
+
+// 没有 return → Promise<void>
+async function fn4(): Promise<void> {
+    console.log('hello');
+}
+```
+
+---
+
+### 2. await 的类型
+
+```javascript
+// await 等待 Promise，获取其结果
+// await 表达式 = Promise 的结果值
+
+const result = await promise;
+//      │        │          │
+//      │        │          └── 要等待的 Promise
+//      │        └── 等待并获取结果
+//      └── 结果变量
+```
+
+**await 的类型：**
+
+```javascript
+// Promise<string> await 后 → string
+const str: string = await Promise.resolve('hello');
+
+// Promise<number> await 后 → number
+const num: number = await Promise.resolve(123);
+
+// Promise<{ id: number }> await 后 → { id: number }
+const obj: { id: number } = await Promise.resolve({ id: 1 });
+```
+
+---
+
+### 3. 完整例子
+
+```javascript
+// 定义一个 async 函数
+async function fetchUser(id: number): Promise<{ name: string; age: number }> {
+    // await 等待 fetch 完成
     const response = await fetch(`/api/users/${id}`);
+    //        │
+    //        └── fetch 返回 Promise<Response>
+    //        await 后变成 Response
+
+    // 再次 await
     const user = await response.json();
+    //              │
+    //              └── response.json() 返回 Promise<{ name: string; age: number }>
+    //              await 后变成 { name: string; age: number }
+
     return user;
 }
 
 // 使用
+```
+
+### 4. 为什么要两个 await？
+
+```javascript
+// 完整代码
+const response = await fetch('/api/data');
+//              │
+//              └── 第1个 await：等待网络请求完成
+
+const data = await response.json();
+//              │
+//              └── 第2个 await：等待读取 body 完成
+```
+
+**为什么 `response.json()` 还需要 await？**
+
+```
+response.json() 的内部实现大概是这样的：
+
+response.json = function() {
+    // 读取 body 也是异步的！
+    return new Promise((resolve) => {
+        // 需要先把 body 读出来
+        // 这个过程是异步的
+        resolve(JSON.parse(body));
+    });
+};
+```
+
+**流程图：**
+
+```
+fetch('/api/data')
+    │
+    ▼ 网络请求（异步）
+Promise<Response>
+    │
+    ▼ await
+Response 对象
+    │
+    ▼
+response.json()
+    │
+    ▼ 读取 body（异步）
+Promise<any>
+    │
+    ▼ await
+实际数据
+```
+
+**简单理解：**
+
+```
+fetch() = 网络请求（异步）
+response.json() = 读取 body（也是异步！）
+```
+
+**类比：**
+
+```
+就像：
+1. 快递到了（fetch 完成）→ 需要 await
+2. 拆开包裹（json() 读取 body）→ 还需要 await
+```
+
+**完整类型标注：**
+
+```javascript
+// 完整写法
+const response: Response = await fetch('/api/data');
+//              │           │
+//              │           └── fetch(): Promise<Response>
+//              └── await 后变成 Response
+
+const data: any = await response.json();
+//              │           │
+//              │           └── response.json(): Promise<any>
+//              └── await 后变成实际数据
+```
 fetchUser(1).then(user => console.log(user));
 ```
 
-### 错误处理
+**类型流程：**
+
+```
+fetchUser(1)
+    │
+    ▼
+fetch() 返回 Promise<Response>
+    │
+    ▼ await
+Response
+    │
+    ▼
+response.json() 返回 Promise<User>
+    │
+    ▼ await
+User
+    │
+    ▼ return
+Promise<User>
+```
+
+---
+
+### 4. async 函数类型定义
 
 ```javascript
-// try-catch
+// async 函数的完整类型
+async function getData(): Promise<string> {
+    return 'hello';
+}
+
+// 等价的非 async 写法
+function getData(): Promise<string> {
+    return Promise.resolve('hello');
+}
+```
+
+---
+
+### 5. 错误处理
+
+```javascript
+// try-catch 语法
 async function fetchData() {
     try {
+        // 可能失败的代码
         const response = await fetch('/api/data');
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
-        }
         return await response.json();
     } catch (error) {
+        // 失败时执行
         console.error('请求失败:', error);
-        throw error;  // 重新抛出
+        throw error;  // 可以重新抛出
     }
 }
 
-// .catch()
-fetchData().catch(error => {
-    console.error('处理错误:', error);
-});
+// 使用
+fetchData()
+    .then(data => console.log(data))
+    .catch(error => console.error(error));
 ```
 
-### 并行执行
+---
+
+### 6. 并行执行
 
 ```javascript
-// 串行（慢）
+// 串行（慢）- 一个接一个
 async function getData() {
     const user = await fetch('/api/user').then(r => r.json());
+    // 上面完成才执行下面
     const posts = await fetch('/api/posts').then(r => r.json());
     return { user, posts };
 }
 
-// 并行（快）- 推荐
+// 并行（快）- 同时执行
 async function getData() {
-    const [user, posts] = await Promise.all([
-        fetch('/api/user').then(r => r.json()),
-        fetch('/api/posts').then(r => r.json())
+    const [userRes, postsRes] = await Promise.all([
+        fetch('/api/user'),
+        fetch('/api/posts')
     ]);
+    
+    const user = await userRes.json();
+    const posts = await postsRes.json();
+    
     return { user, posts };
 }
+```
+
+---
+
+### 7. 一句话总结
+
+```
+async 函数 = 自动返回 Promise 的函数
+await = 等待 Promise 结果的语法
 ```
 
 ---
