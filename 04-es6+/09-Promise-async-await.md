@@ -38,44 +38,171 @@ Promise = "承诺" = 未来的结果
 └─────────────────────────────────────────┘
 ```
 
-### 完整例子拆解
+### 1. setTimeout 是什么？
+
+```
+setTimeout = "定时器" = "延迟执行"
+
+就像：
+- 定一个闹钟
+- 过了指定时间后，执行某个操作
+```
 
 ```javascript
-const promise = new Promise((resolve, reject) => {
-    // 异步操作
-    setTimeout(() => {
-        const success = true;
-        if (success) {
-            resolve('操作成功');  // 成功，调用 resolve
-        } else {
-            reject(new Error('操作失败'));  // 失败，调用 reject
-        }
-    }, 1000);  // 1秒后执行
+// 完整写法
+setTimeout(() => {
+    console.log('1秒后执行');
+}, 1000);  // 1000 毫秒 = 1秒
+```
+
+**拆解：**
+```javascript
+setTimeout(函数, 时间);
+//      │       │
+//      │       └── 延迟时间（毫秒）
+//      └── 延迟后要执行的代码
+```
+
+**例子：**
+```javascript
+// 1秒后打印 Hello
+setTimeout(() => {
+    console.log('Hello');
+}, 1000);
+
+// 2秒后打印 World
+setTimeout(() => {
+    console.log('World');
+}, 2000);
+```
+
+---
+
+### 2. resolve 和 reject 是什么？
+
+```
+resolve 和 reject 都是"函数"
+
+- resolve = "解决" = 告诉 Promise 成功了
+- reject = "拒绝" = 告诉 Promise 失败了
+```
+
+**它们是 Promise 给你的两个"按钮"：**
+
+```javascript
+new Promise((resolve, reject) => {
+    // resolve 和 reject 是两个函数
+    // 你来决定按哪个
+    
+    // 按这个 = 成功
+    resolve('成功啦！');
+    
+    // 按这个 = 失败
+    reject('失败啦！');
 });
 ```
 
-**逐步拆解：**
+**实际例子：**
 
 ```javascript
-// 1. new Promise() 创建承诺
+// 模拟：点外卖
+const order = new Promise((resolve, reject) => {
+    // 假设 1 秒后出结果
+    setTimeout(() => {
+        const success = true;
+        
+        if (success) {
+            // 成功！按这个按钮
+            resolve('外卖到了！');
+        } else {
+            // 失败！按这个按钮
+            reject('外卖没送到');
+        }
+    }, 1000);
+});
+```
+
+**resolve('值') 传递的值去哪了？**
+
+```javascript
+// 1. 创建 Promise
 const promise = new Promise((resolve, reject) => {
-    //          │                    │
-    //          │                    └── 两个参数：resolve 和 reject
-    //          └── 箭头函数（参数是函数）
-    //
-    // 这个箭头函数会在 Promise 内部被调用
-    // 你需要决定什么时候调用 resolve（成功）
-    // 什么时候调用 reject（失败）
+    resolve('操作成功');  // 把"操作成功"传出去
 });
 
-// 2. setTimeout 模拟异步
-setTimeout(() => {
-    // 1秒后执行这里
-}, 1000);
+// 2. 用 .then() 接收
+promise.then((result) => {
+    console.log(result);  // 输出："操作成功"
+});
+```
 
-// 3. resolve 和 reject
-resolve('操作成功');    // 调用这个 = 成功
-reject(new Error('失败')); // 调用这个 = 失败
+---
+
+### 3. 完整例子逐步拆解
+
+```javascript
+const promise = new Promise((resolve, reject) => {
+    // 1. 这里写异步代码
+    setTimeout(() => {
+        // 2. 1秒后执行这里
+        
+        const success = true;
+        
+        if (success) {
+            // 3. 成功，调用 resolve
+            resolve('操作成功');
+        } else {
+            // 4. 失败，调用 reject
+            reject(new Error('操作失败'));
+        }
+    }, 1000);  // 延迟 1 秒
+});
+```
+
+**流程图：**
+
+```
+new Promise((resolve, reject) => {
+    │
+    │  ← resolve 和 reject 是两个"按钮"
+    │
+    ▼
+setTimeout(() => {
+    │
+    │  ← 1秒后执行
+    │
+    ▼
+    if (success) {
+        resolve('成功');  ← 按成功按钮，传递"成功"
+    } else {
+        reject('失败');   ← 按失败按钮，传递"失败"
+    }
+})
+```
+
+---
+
+### 4. 箭头函数简化过程
+
+```javascript
+// 原始写法（不用箭头函数）
+const promise = new Promise(function(resolve, reject) {
+    setTimeout(function() {
+        resolve('成功');
+    }, 1000);
+});
+
+// 箭头函数简化
+const promise = new Promise((resolve, reject) => {
+    setTimeout(() => {
+        resolve('成功');
+    }, 1000);
+});
+
+// 对比：
+// function(resolve, reject) { }  = (resolve, reject) => { }
+// function() { }                = () => { }
+// function(result) { }          = (result) => { }
 ```
 
 ### 箭头函数详细解释
