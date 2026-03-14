@@ -8,6 +8,50 @@
 
 ---
 
+## 6.0 通俗理解 Class
+
+### 什么是 Class？
+
+```
+Class = "类" = 对象的"模板"
+
+就像：
+- 蓝图：定义了房子长什么样
+- Class：定义了对象有什么属性和方法
+- new：按照蓝图造房子
+```
+
+### Class vs 构造函数
+
+```javascript
+// 构造函数（老方式）
+function Person(name) {
+    this.name = name;
+}
+Person.prototype.sayHi = function() { };
+
+// Class（新方式）
+class Person {
+    constructor(name) {
+        this.name = name;
+    }
+    sayHi() { }
+}
+// 效果一样，但更简洁！
+```
+
+### 核心概念
+
+| 概念 | 通俗理解 |
+|------|----------|
+| class | 模板/蓝图 |
+| constructor | 构造函数（创建时调用） |
+| new | 按模板造对象 |
+| extends | 继承/父子关系 |
+| super | 调用父类方法 |
+
+---
+
 ## 6.1 class 基础
 
 ### 基本语法
