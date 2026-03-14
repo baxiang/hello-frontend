@@ -68,21 +68,264 @@ npx tsc --init
 | ES2017 | ES2017 | 大部分浏览器 |
 | ES6 | ES2015 | IE11 不支持 |
 
-### module - 模块系统
+### module - 模块系统（重点详解）
 
-指定使用的模块化方案：
+#### 什么是模块系统？
+
+```
+模块系统 = 代码组织方式 = 如何导入和导出代码
+```
+
+在编程中，我们需要把代码分成多个文件，这就涉及到：
+- 如何导出：A 文件的代码给 B 文件用
+- 如何导入：B 文件要使用 A 文件的代码
+
+不同的环境（浏览器、Node.js）有不同的方式，这就是"模块系统"。
+
+#### 为什么需要不同的模块系统？
+
+```
+场景：你在不同环境写代码
+
+浏览器环境：
+- 没有文件系统
+- 需要下载模块
+- 只能用 <script> 标签
+
+Node.js 环境：
+- 有文件系统
+- 可以 require() 模块
+- 可以读取文件
+
+所以需要不同的模块系统来适配不同环境
+```
+
+#### 三种主要模块系统详解
+
+##### 1. CommonJS（Node.js 后端）
+
+```
+最常用：Node.js 后端项目
+文件后缀：.js
+```
+
+```typescript
+// 导出
+// math.ts
+function add(a: number, b: number): number {
+    return a + b;
+}
+
+module.exports = { add };
+
+// 导入
+// main.ts
+const { add } = require('./math');
+console.log(add(1, 2));  // 3
+```
+
+编译后的 JavaScript：
+
+```javascript
+// 编译后
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+function add(a, b) {
+    return a + b;
+}
+exports.add = add;
+```
+
+**特点：**
+- 使用 `require()` 导入
+- 使用 `module.exports` 导出
+- 同步加载
+- Node.js 默认支持
+
+**适用场景：**
+- Node.js 后端项目
+- 服务端代码
+
+##### 2. ES Modules（现代前端）
+
+```
+最常用：现代前端项目（配合 Vite、Webpack）
+文件后缀：.js 或 .mjs
+```
+
+```typescript
+// 导出
+// math.ts
+export function add(a: number, b: number): number {
+    return a + b;
+}
+
+export const name = 'math';
+
+// 导入
+// main.ts
+import { add, name } from './math';
+console.log(add(1, 2));  // 3
+```
+
+编译后的 JavaScript：
+
+```javascript
+// 编译后（ESNext）
+import { add } from './math.js';
+console.log(add(1, 2));
+
+// 编译后（CommonJS 兼容）
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.add = function(a, b) { return a + b; };
+```
+
+**特点：**
+- 使用 `import` 导入
+- 使用 `export` 导出
+- 异步加载
+- 现代浏览器支持
+- Tree-shaking（摇树优化）
+
+**适用场景：**
+- 现代前端项目（Vue、React）
+- 需要构建工具的项目
+
+##### 3. UMD（通用模块）
+
+```
+兼容：既可以在浏览器用，又可以在 Node.js 用
+文件后缀：.umd.js
+```
+
+```typescript
+// 编译后
+(function (global, factory) {
+    typeof exports === 'object' && typeof module !== 'undefined' ? 
+        factory(exports) :
+    typeof define === 'function' && define.amd ? 
+        define(['exports'], factory) :
+    (global = global || self, factory(global.math = {}));
+}(this, function (exports) { 
+    'use strict';
+    exports.add = function(a, b) { return a + b; };
+}));
+```
+
+**特点：**
+- 先判断 CommonJS 环境
+- 再判断 AMD 环境
+- 最后作为全局变量
+- 适合编写库
+
+**适用场景：**
+- 需要同时支持浏览器和 Node.js 的库
+- 第三方组件库
+
+#### module 配置值
 
 ```json
 {
-    "module": "ESNext"  // ESNext, CommonJS, AMD, UMD
+    "module": "ESNext"      // 现代前端（推荐）
+    // 或
+    "module": "CommonJS"     // Node.js 后端
+    // 或
+    "module": "UMD"          // 通用模块
+    // 或
+    "module": "AMD"          // 旧版浏览器（很少用）
+    // 或
+    "module": "System"       // SystemJS（很少用）
 }
 ```
 
-| module | 说明 | 使用场景 |
-|--------|------|----------|
-| ESNext | ES 模块 | 现代前端项目 |
-| CommonJS | Node.js 模块 | Node.js 后端 |
-| AMD | 浏览器模块 | 旧版浏览器 |
+#### 如何选择？
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                    选择指南                              │
+├─────────────────────────────────────────────────────────┤
+│                                                         │
+│  前端项目（Vue、React）                                  │
+│  → module: "ESNext"                                    │
+│  → 配合 Vite 或 Webpack 使用                            │
+│                                                         │
+├─────────────────────────────────────────────────────────┤
+│                                                         │
+│  Node.js 后端项目                                       │
+│  → module: "CommonJS"                                   │
+│  → Node.js 原生支持                                     │
+│                                                         │
+├─────────────────────────────────────────────────────────┤
+│                                                         │
+│  需要发布到 npm 的库                                     │
+│  → module: "ESNext" + "CommonJS"（双版本）             │
+│  → 或使用工具（如 rollup）打包                          │
+│                                                         │
+├─────────────────────────────────────────────────────────┤
+│                                                         │
+│  旧项目兼容                                              │
+│  → module: "AMD" 或 "UMD"                               │
+│                                                         │
+└─────────────────────────────────────────────────────────┘
+```
+
+#### module 和 target 的关系
+
+```
+target = 编译到哪个 JavaScript 版本
+module = 使用什么模块化方式
+```
+
+| target | module 常见配置 | 说明 |
+|--------|-----------------|------|
+| ES2022 | ESNext | 现代语法 + 现代模块 |
+| ES2020 | CommonJS | 现代语法 + Node.js 模块 |
+| ES6 | ESNext | ES6 语法 + 现代模块 |
+| ES5 | CommonJS | ES5 语法 + Node.js 模块 |
+
+**常见组合：**
+
+```json
+// 现代前端项目（推荐）
+{
+    "target": "ES2022",
+    "module": "ESNext"
+}
+
+// Node.js 后端项目
+{
+    "target": "ES2020",
+    "module": "CommonJS"
+}
+
+// 兼容旧浏览器
+{
+    "target": "ES5",
+    "module": "CommonJS"
+}
+```
+
+#### 实际配置示例
+
+```json
+{
+    "compilerOptions": {
+        // 现代前端项目
+        "target": "ES2022",
+        "module": "ESNext",
+        
+        // Node.js 后端项目
+        // "target": "ES2020",
+        // "module": "CommonJS",
+        
+        // 其他选项...
+        "strict": true,
+        "esModuleInterop": true,
+        "skipLibCheck": true
+    }
+}
+```
 
 ### strict - 严格模式
 
