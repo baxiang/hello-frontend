@@ -8,6 +8,121 @@
 
 ---
 
+## 8.0 通俗理解 Promise
+
+### Promise 是什么？
+
+```
+Promise = "承诺" = 未来的结果
+
+就像：
+- 点外卖时，店员给你一个"取餐号"
+- 做好了叫你来取（resolve）
+- 没做好说抱歉（reject）
+- 这就是 Promise
+```
+
+### Promise 的三种状态
+
+```
+┌─────────────────────────────────────────┐
+│           Promise 状态                  │
+├─────────────────────────────────────────┤
+│                                         │
+│  pending（等待中）                      │
+│       ↓ 成功                            │
+│  fulfilled（已完成） ──→ .then()       │
+│       ↓ 失败                            │
+│  rejected（已失败） ──→ .catch()       │
+│                                         │
+└─────────────────────────────────────────┘
+```
+
+### 完整例子拆解
+
+```javascript
+const promise = new Promise((resolve, reject) => {
+    // 异步操作
+    setTimeout(() => {
+        const success = true;
+        if (success) {
+            resolve('操作成功');  // 成功，调用 resolve
+        } else {
+            reject(new Error('操作失败'));  // 失败，调用 reject
+        }
+    }, 1000);  // 1秒后执行
+});
+```
+
+**逐步拆解：**
+
+```javascript
+// 1. new Promise() 创建承诺
+const promise = new Promise((resolve, reject) => {
+    //          │                    │
+    //          │                    └── 两个参数：resolve 和 reject
+    //          └── 箭头函数（参数是函数）
+    //
+    // 这个箭头函数会在 Promise 内部被调用
+    // 你需要决定什么时候调用 resolve（成功）
+    // 什么时候调用 reject（失败）
+});
+
+// 2. setTimeout 模拟异步
+setTimeout(() => {
+    // 1秒后执行这里
+}, 1000);
+
+// 3. resolve 和 reject
+resolve('操作成功');    // 调用这个 = 成功
+reject(new Error('失败')); // 调用这个 = 失败
+```
+
+### 箭头函数详细解释
+
+```javascript
+// 原始写法
+const promise = new Promise(function(resolve, reject) {
+    setTimeout(function() {
+        resolve('成功');
+    }, 1000);
+});
+
+// 箭头函数简化
+const promise = new Promise((resolve, reject) => {
+    setTimeout(() => {
+        resolve('成功');
+    }, 1000);
+});
+
+// 对比：
+// function(resolve, reject) { }  = (resolve, reject) => { }
+// function() { }                = () => { }
+// function(result) { }          = (result) => { }
+```
+
+### 用法：等待结果
+
+```javascript
+// 创建 Promise
+const promise = new Promise((resolve, reject) => {
+    setTimeout(() => {
+        resolve('操作成功');
+    }, 1000);
+});
+
+// 等待结果
+promise
+    .then(result => {
+        console.log('成功:', result);  // "操作成功"
+    })
+    .catch(error => {
+        console.log('失败:', error);
+    });
+```
+
+---
+
 ## 8.1 Promise 基础
 
 ### 创建 Promise
