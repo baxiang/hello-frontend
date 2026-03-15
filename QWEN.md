@@ -6,7 +6,7 @@
 
 ### 技术栈覆盖
 - **基础三件套**: HTML5、CSS3、JavaScript
-- **现代语法**: ES6+、TypeScript
+- **现代语法**: ES6+、TypeScript 5.x
 - **后端拓展**: Node.js
 - **工程化**: Webpack、Vite、ESLint、测试工具
 - **框架**: React、Vue 及其生态
@@ -18,11 +18,12 @@ hello-frontend/
 ├── CLAUDE.md                     # Claude Code 上下文
 ├── QWEN.md                       # 本文件
 ├── .claude/settings.local.json   # Claude 本地配置
+├── .gitignore                    # Git 忽略规则
 ├── 01-html5/                     # HTML5 模块 (3 章)
 ├── 02-css3/                      # CSS3 模块 (4 章)
 ├── 03-javascript/                # JavaScript 模块 (4 章)
-├── 04-es6+/                      # ES6+ 模块 (9 章)
-├── 05-typescript/                # TypeScript 模块 (6 章)
+├── 04-es6+/                      # ES6+ 模块 (14 章)
+├── 05-typescript/                # TypeScript 模块 (10 章 + 补充文档)
 ├── 06-nodejs/                    # Node.js 模块 (6 章)
 ├── 07-engineering/               # 工程化模块 (1 章)
 └── 08-frameworks/                # 框架模块 (1 章)
@@ -35,11 +36,11 @@ hello-frontend/
 | 01-html5 | 3 | 基础语法、表单详解、语义化标签 |
 | 02-css3 | 4 | 基础语法、布局相关、动画与过渡、响应式设计 |
 | 03-javascript | 4 | 核心语法、DOM 操作、异步编程、高级特性 |
-| 04-es6+ | 9 | let/const、箭头函数、解构、Class、模块化、Promise 等 |
-| 05-typescript | 6 | 基础类型、接口、类型别名、泛型、类型守卫、装饰器 |
+| 04-es6+ | 14 | let/const、箭头函数、解构、Class、模块化、Promise、生成器、Proxy 等 |
+| 05-typescript | 10+ | 基础类型、接口、类型别名、泛型、类型守卫、高级类型编程、工具类型、装饰器、实战 |
 | 06-nodejs | 6 | Node.js 基础、HTTP 与 Web、数据库、认证安全、实用技术、项目实战 |
 | 07-engineering | 1 | npm/yarn/pnpm、Webpack、Vite、ESLint、Prettier、Vitest |
-| 08-frameworks | 1 | React 基础、Vue 基础、Router、状态管理 |
+| 08-frameworks | 1 | React 基础、Vue 基础、Router、状态管理（Redux/Pinia） |
 
 ## 文档结构模式
 
@@ -51,7 +52,7 @@ hello-frontend/
 5. **学习资源** - 参考文档和延伸阅读
 
 ### 代码示例风格
-- 使用 HTML/CSS/JavaScript 标准语法
+- 使用 HTML/CSS/JavaScript/TypeScript 标准语法
 - 注释使用中文
 - 遵循现代 ES6+ 语法规范
 - 包含最佳实践和反模式对比
@@ -90,8 +91,19 @@ hello-frontend/
 
 ## Git 配置
 
-- **远程仓库**: `git@github.com:baxiang/hello-frontend.git`
-- **预授权命令**: git init/add/commit/config/remote/branch/push/log
+### 远程仓库
+- **URL**: `git@github.com:baxiang/hello-frontend.git`
+
+### 预授权命令
+在 `.claude/settings.local.json` 中配置的允许命令：
+- `git init`, `git add`, `git commit`, `git config`
+- `git remote add`, `git branch`, `git push`
+- `git log`, `git remote`, `git status`
+
+### 提交规范
+- 使用清晰的提交信息，说明变更内容
+- 保持提交粒度适中
+- 遵循项目已有的提交风格
 
 ## 协作指南
 
@@ -109,6 +121,12 @@ hello-frontend/
 - 章节完成后标记 ✅ 状态
 - 保持文档间的交叉引用正确
 
+## 项目状态
+
+- **总章节数**: 35+ 章
+- **完成状态**: 全部完成 ✅
+- **最后更新**: 2026-03-01
+
 ## 常用资源
 
 ### 官方文档
@@ -122,9 +140,3 @@ hello-frontend/
 - [freeCodeCamp](https://www.freecodecamp.org/)
 - [CodePen](https://codepen.io/)
 - [StackBlitz](https://stackblitz.com/)
-
-## 项目状态
-
-- **总章节数**: 25+ 章
-- **完成状态**: 全部完成 ✅
-- **最后更新**: 2026-03-01
