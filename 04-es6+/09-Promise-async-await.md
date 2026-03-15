@@ -1,1120 +1,539 @@
 # Promise 与 async/await
 
+> 从零开始理解 JavaScript 的异步编程
+
 ## 学习目标
-- 理解 Promise 的三种状态
-- 掌握 Promise 链式调用
-- 掌握 Promise 组合方法
-- 熟练使用 async/await
+
+- ✅ 理解 Promise 的三种状态
+- ✅ 掌握 Promise 链式调用
+- ✅ 掌握 Promise 组合方法
+- ✅ 熟练使用 async/await
 
 ---
 
-## 8.0 通俗理解 Promise
+## 9.0 为什么要学 Promise？
 
-### Promise 是什么？
+### 9.0.1 故事背景：异步编程
 
-```
-Promise = "承诺" = 未来的结果
-
-就像：
-- 点外卖时，店员给你一个"取餐号"
-- 做好了叫你来取（resolve）
-- 没做好说抱歉（reject）
-- 这就是 Promise
-```
-
-### Promise 的三种状态
-
-```
-┌─────────────────────────────────────────┐
-│           Promise 状态                  │
-├─────────────────────────────────────────┤
-│                                         │
-│  pending（等待中）                      │
-│       ↓ 成功                            │
-│  fulfilled（已完成） ──→ .then()       │
-│       ↓ 失败                            │
-│  rejected（已失败） ──→ .catch()       │
-│                                         │
-└─────────────────────────────────────────┘
-```
-
-### 1. setTimeout 的参数类型
+JavaScript 是单线程的，很多操作不能"等待"完成：
 
 ```javascript
-setTimeout(函数, 时间);
+// 同步代码：一步一步执行
+console.log('1');
+console.log('2');
+console.log('3');
+
+// 异步代码：不能等待
+console.log('1');
+setTimeout(() => console.log('2'), 1000);  // 1秒后执行
+console.log('3');  // 立即执行，不等待 setTimeout
 ```
 
-**setTimeout 接收两个参数：**
-
-| 参数 | 类型 | 说明 |
-|------|------|------|
-| 第1个 | `function` | 延迟后要执行的函数 |
-| 第2个 | `number` | 延迟时间（毫秒） |
-
-**具体类型：**
+### 9.0.2 回调函数的问题
 
 ```javascript
-// setTimeout 的类型定义：
-// setTimeout(callback: () => void, delay: number): number
-
-setTimeout(() => {
-    // 这里的 () => {} 是 function 类型
-    console.log('执行了');
-}, 1000);
-//        │       │
-//        │       └── number 类型
-//        └── function 类型
+// 回调地狱
+fetchData(function(a) {
+    processData(a, function(b) {
+        saveData(b, function(c) {
+            console.log(c);
+        });
+    });
+});
 ```
 
-**详细拆解：**
+### 9.0.3 Promise 的解决方案
 
-```javascript
-// 第一个参数：function（函数）
-// 可以是：
-() => { }                    // 无参数函数
-(a) => { }                   // 1个参数函数
-(a, b) => { }                // 2个参数函数
-
-// 第二个参数：number（数字）
-// 必须是数字，单位是毫秒
-1000    // 1秒
-2000    // 2秒
-500     // 0.5秒
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    Promise 的优势                            │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  1. 更清晰的异步流程控制                                    │
+│     → 链式调用 .then().then()                               │
+│                                                             │
+│  2. 统一的错误处理                                          │
+│     → .catch() 集中处理错误                                 │
+│                                                             │
+│  3. 组合多个异步操作                                        │
+│     → Promise.all、Promise.race                           │
+│                                                             │
+│  4. async/await 语法糖                                       │
+│     → 看起来像同步代码                                      │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
 ```
 
-**完整例子：**
+### 9.0.4 本章学习路径
 
-```javascript
-// setTimeout(函数, 时间)
-setTimeout(() => console.log('Hello'), 1000);
-//          │              │
-//          │              └── 第二个参数：number（毫秒）
-//          └── 第一个参数：function（箭头函数）
+```
+第一步：理解 Promise 概念（什么是 Promise）
+    ↓
+第二步：Promise 基础（创建和使用）
+    ↓
+第三步：Promise 链式调用（.then().catch()）
+    ↓
+第四步：Promise 组合方法（all、race）
+    ↓
+第五步：async/await（更简洁的语法）
 ```
 
 ---
 
-### 2. Promise 的参数类型
+## 9.1 Promise 基础详解
 
-```javascript
-new Promise((resolve, reject) => {
-    //           │        │
-    //           │        └── reject: (reason?: any) => void
-    //           └── resolve: (value?: any) => void
-});
-```
-
-**Promise 构造函数接收一个函数作为参数：**
-
-```javascript
-// Promise 的类型定义：
-// new Promise(executor: (resolve, reject) => void)
-
-// executor 是一个函数，接收两个参数：
-// - resolve: (value?: any) => void
-// - reject: (reason?: any) => void
-```
-
-**resolve 的类型：**
-
-```javascript
-// resolve 是一个函数，类型是：
-(value?: any) => void
-
-// 参数可以是任意类型：
-resolve('成功');           // 传字符串
-resolve(123);             // 传数字
-resolve({ ok: true });    // 传对象
-resolve([1, 2, 3]);      // 传数组
-```
-
-**reject 的类型：**
-
-```javascript
-// reject 是一个函数，类型是：
-(reason?: any) => void
-
-// 通常传 Error 对象：
-reject(new Error('失败原因'));
-reject('失败原因');  // 也可以传字符串
-```
-
-**完整类型标注：**
-
-```javascript
-// 完整写法
-const promise = new Promise<any>((resolve: (value: any) => void, reject: (reason?: any) => void) => {
-    // resolve 的类型：(value: any) => void
-    // reject 的类型：(reason?: any) => void
-    
-    resolve('成功');  // resolve 接收 any 类型
-    reject(new Error('失败'));  // reject 接收 any 类型
-});
-```
-
-**简化理解：**
-
-```javascript
-new Promise((resolve, reject) => {
-    // resolve = (value) => {}  ← 一个接收值的函数
-    // reject = (error) => {}   ← 一个接收错误的函数
-    
-    // 调用 resolve，传递成功的结果
-    resolve('操作成功');
-    
-    // 或者调用 reject，传递失败的原因
-    reject(new Error('操作失败'));
-});
-```
-
----
-
-### 2. resolve 和 reject 是什么？
+### 9.1.1 什么是 Promise？
 
 ```
-resolve 和 reject 都是"函数"
-
-- resolve = "解决" = 告诉 Promise 成功了
-- reject = "拒绝" = 告诉 Promise 失败了
+┌─────────────────────────────────────────────────────────────┐
+│  Promise = "承诺" = 异步操作的结果                          │
+│                                                             │
+│  三种状态：                                                  │
+│  - pending（等待中）：刚开始，还没结果                        │
+│  - fulfilled（已完成）：成功了！                              │
+│  - rejected（已失败）：失败了                                │
+│                                                             │
+│  状态变化：                                                  │
+│  pending → fulfilled（调用 resolve）                        │
+│  pending → rejected（调用 reject）                         │
+│                                                             │
+│  一旦状态改变，就不能再变                                    │
+└─────────────────────────────────────────────────────────────┘
 ```
 
-**它们是 Promise 给你的两个"按钮"：**
-
-```javascript
-new Promise((resolve, reject) => {
-    // resolve 和 reject 是两个函数
-    // 你来决定按哪个
-    
-    // 按这个 = 成功
-    resolve('成功啦！');
-    
-    // 按这个 = 失败
-    reject('失败啦！');
-});
-```
-
-**实际例子：**
-
-```javascript
-// 模拟：点外卖
-const order = new Promise((resolve, reject) => {
-    // 假设 1 秒后出结果
-    setTimeout(() => {
-        const success = true;
-        
-        if (success) {
-            // 成功！按这个按钮
-            resolve('外卖到了！');
-        } else {
-            // 失败！按这个按钮
-            reject('外卖没送到');
-        }
-    }, 1000);
-});
-```
-
-**resolve('值') 传递的值去哪了？**
-
-```javascript
-// 1. 创建 Promise
-const promise = new Promise((resolve, reject) => {
-    resolve('操作成功');  // 把"操作成功"传出去
-});
-
-// 2. 用 .then() 接收
-promise.then((result) => {
-    console.log(result);  // 输出："操作成功"
-});
-```
-
----
-
-### 3. 完整例子逐步拆解
-
-```javascript
-const promise = new Promise((resolve, reject) => {
-    // 1. 这里写异步代码
-    setTimeout(() => {
-        // 2. 1秒后执行这里
-        
-        const success = true;
-        
-        if (success) {
-            // 3. 成功，调用 resolve
-            resolve('操作成功');
-        } else {
-            // 4. 失败，调用 reject
-            reject(new Error('操作失败'));
-        }
-    }, 1000);  // 延迟 1 秒
-});
-```
-
-**流程图：**
-
-```
-new Promise((resolve, reject) => {
-    │
-    │  ← resolve 和 reject 是两个"按钮"
-    │
-    ▼
-setTimeout(() => {
-    │
-    │  ← 1秒后执行
-    │
-    ▼
-    if (success) {
-        resolve('成功');  ← 按成功按钮，传递"成功"
-    } else {
-        reject('失败');   ← 按失败按钮，传递"失败"
-    }
-})
-```
-
----
-
-### 4. 箭头函数简化过程
-
-```javascript
-// 原始写法（不用箭头函数）
-const promise = new Promise(function(resolve, reject) {
-    setTimeout(function() {
-        resolve('成功');
-    }, 1000);
-});
-
-// 箭头函数简化
-const promise = new Promise((resolve, reject) => {
-    setTimeout(() => {
-        resolve('成功');
-    }, 1000);
-});
-
-// 对比：
-// function(resolve, reject) { }  = (resolve, reject) => { }
-// function() { }                = () => { }
-// function(result) { }          = (result) => { }
-```
-
-### 箭头函数详细解释
-
-```javascript
-// 原始写法
-const promise = new Promise(function(resolve, reject) {
-    setTimeout(function() {
-        resolve('成功');
-    }, 1000);
-});
-
-// 箭头函数简化
-const promise = new Promise((resolve, reject) => {
-    setTimeout(() => {
-        resolve('成功');
-    }, 1000);
-});
-
-// 对比：
-// function(resolve, reject) { }  = (resolve, reject) => { }
-// function() { }                = () => { }
-// function(result) { }          = (result) => { }
-```
-
-### 用法：等待结果
+### 9.1.2 创建 Promise
 
 ```javascript
 // 创建 Promise
 const promise = new Promise((resolve, reject) => {
-    setTimeout(() => {
-        resolve('操作成功');
-    }, 1000);
-});
-
-// 等待结果
-promise
-    .then(result => {
-        console.log('成功:', result);  // "操作成功"
-    })
-    .catch(error => {
-        console.log('失败:', error);
-    });
-```
-
----
-
-## 8.1 Promise 基础
-
-### 创建 Promise
-
-```javascript
-const promise = new Promise((resolve, reject) => {
     // 异步操作
     setTimeout(() => {
         const success = true;
+
         if (success) {
-            resolve('操作成功');
+            resolve('操作成功！');  // 成功，传递结果
         } else {
-            reject(new Error('操作失败'));
+            reject(new Error('操作失败'));  // 失败，传递错误
         }
     }, 1000);
 });
 
-// Promise 的三种状态
-// pending - 进行中
-// fulfilled - 已成功
-// rejected - 已失败
-```
-
-### then/catch/finally
-
-```javascript
+// 使用 Promise
 promise
     .then(result => {
-        console.log('成功:', result);
-        return '新的值';
+        console.log(result);  // '操作成功！'
     })
     .catch(error => {
-        console.error('失败:', error);
-        throw error;  // 可以重新抛出
+        console.error(error);  // Error: 操作失败
+    });
+```
+
+### 9.1.3 resolve 和 reject
+
+```javascript
+// resolve：告诉 Promise 成功了
+const promise1 = new Promise((resolve, reject) => {
+    resolve('成功的结果');
+});
+
+// reject：告诉 Promise 失败了
+const promise2 = new Promise((resolve, reject) => {
+    reject(new Error('失败的原因'));
+});
+
+// 简化：直接返回成功/失败的 Promise
+const promise3 = Promise.resolve('直接成功');
+const promise4 = Promise.reject(new Error('直接失败'));
+```
+
+---
+
+## 9.2 Promise 链式调用
+
+### 9.2.1 .then()
+
+```javascript
+// .then() 处理成功的情况
+const promise = new Promise((resolve, reject) => {
+    resolve(1);
+});
+
+promise
+    .then(result => {
+        console.log(result);  // 1
+        return result * 2;     // 返回值会传递给下一个 .then()
+    })
+    .then(result => {
+        console.log(result);  // 2
+        return result * 2;
+    })
+    .then(result => {
+        console.log(result);  // 4
+    });
+```
+
+### 9.2.2 .catch()
+
+```javascript
+// .catch() 处理错误
+const promise = new Promise((resolve, reject) => {
+    reject(new Error('出错了'));
+});
+
+promise
+    .then(result => {
+        console.log(result);
+    })
+    .catch(error => {
+        console.error(error.message);  // '出错了'
+    });
+```
+
+### 9.2.3 .finally()
+
+```javascript
+// .finally() 无论成功失败都执行
+const promise = new Promise((resolve, reject) => {
+    resolve('成功');
+});
+
+promise
+    .then(result => {
+        console.log(result);
+    })
+    .catch(error => {
+        console.error(error);
     })
     .finally(() => {
-        console.log('无论成功失败都会执行');
+        console.log('清理工作');  // 无论成功失败都执行
     });
 ```
 
-### 链式调用
+### 9.2.4 完整流程
 
 ```javascript
+new Promise((resolve, reject) => {
+    // 异步操作
+})
+    .then(成功的处理函数)
+    .then(成功的处理函数)
+    .catch(失败的处理函数)
+    .finally(最终清理);
+```
+
+---
+
+## 9.3 Promise 组合方法
+
+### 9.3.1 Promise.all()
+
+等待所有 Promise 完成。
+
+```javascript
+const p1 = Promise.resolve(1);
+const p2 = Promise.resolve(2);
+const p3 = Promise.resolve(3);
+
+Promise.all([p1, p2, p3])
+    .then(results => {
+        console.log(results);  // [1, 2, 3]
+    });
+
+// 实际应用：并行请求多个 API
+const request1 = fetch('/api/users');
+const request2 = fetch('/api/posts');
+
+Promise.all([request1, request2])
+    .then(([usersResponse, postsResponse]) => {
+        return Promise.all([
+            usersResponse.json(),
+            postsResponse.json()
+        ]);
+    })
+    .then(([users, posts]) => {
+        console.log(users, posts);
+    });
+```
+
+### 9.3.2 Promise.race()
+
+返回最先完成（无论成功或失败）的 Promise。
+
+```javascript
+const p1 = new Promise(resolve => setTimeout(() => resolve('1'), 1000));
+const p2 = new Promise(resolve => setTimeout(() => resolve('2'), 500));
+const p3 = new Promise((_, reject) => setTimeout(() => reject('3'), 300));
+
+Promise.race([p1, p2, p3])
+    .then(result => {
+        console.log(result);  // '2'（p2 最先完成）
+    })
+    .catch(error => {
+        console.log(error);  // 如果 p3 先失败，会输出 '3'
+    });
+```
+
+### 9.3.3 Promise.allSettled()
+
+等待所有 Promise 结束（无论成功或失败）。
+
+```javascript
+const p1 = Promise.resolve(1);
+const p2 = Promise.reject(new Error('失败'));
+const p3 = Promise.resolve(3);
+
+Promise.allSettled([p1, p2, p3])
+    .then(results => {
+        console.log(results);
+        // [
+        //   { status: 'fulfilled', value: 1 },
+        //   { status: 'rejected', reason: Error: 失败 },
+        //   { status: 'fulfilled', value: 3 }
+        // ]
+    });
+```
+
+### 9.3.4 Promise.any()
+
+返回第一个成功的 Promise。
+
+```javascript
+const p1 = Promise.reject(new Error('1'));
+const p2 = Promise.resolve('2');
+const p3 = Promise.resolve('3');
+
+Promise.any([p1, p2, p3])
+    .then(result => {
+        console.log(result);  // '2'（p2 最先成功）
+    })
+    .catch(error => {
+        console.log(error);  // 全部失败时
+    });
+```
+
+---
+
+## 9.4 async/await 详解
+
+### 9.4.1 什么是 async/await？
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  async/await = Promise 的"语法糖"                           │
+│                                                             │
+│  让异步代码看起来像同步代码                                  │
+│                                                             │
+│  async：声明异步函数                                         │
+│  await：等待 Promise 完成                                    │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### 9.4.2 基本语法
+
+```javascript
+// Promise 方式
+function fetchData() {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            resolve('数据');
+        }, 1000);
+    });
+}
+
 fetchData()
-    .then(data => process(data))
-    .then(result => save(result))
-    .then(saved => notify(saved))
-    .catch(error => console.error(error));
-
-// 每个 then 都返回新的 Promise
-// 可以链式调用
-```
-
----
-
-## 8.2 Promise 组合
-
-### Promise.all
-
-```javascript
-// 等待所有 Promise 完成
-Promise.all([
-    fetch('/api/users'),
-    fetch('/api/posts'),
-    fetch('/api/comments')
-])
-.then(([usersRes, postsRes, commentsRes]) => {
-    return Promise.all([
-        usersRes.json(),
-        postsRes.json(),
-        commentsRes.json()
-    ]);
-})
-.then(([users, posts, comments]) => {
-    console.log('全部完成');
-})
-.catch(error => {
-    // 任一失败都会触发
-    console.error('有请求失败:', error);
-});
-```
-
-### Promise.allSettled
-
-```javascript
-// 等待所有完成，不管成功失败
-Promise.allSettled([
-    Promise.resolve('成功 1'),
-    Promise.reject('失败 1'),
-    Promise.resolve('成功 2')
-])
-.then(results => {
-    results.forEach(result => {
-        if (result.status === 'fulfilled') {
-            console.log('成功:', result.value);
-        } else {
-            console.log('失败:', result.reason);
-        }
-    });
-});
-```
-
-### Promise.race
-
-```javascript
-// 第一个完成的 Promise
-Promise.race([
-    fetch('/api/fast'),
-    fetch('/api/slow')
-])
-.then(response => {
-    console.log('最快的响应:', response);
-});
-
-// 超时控制
-function fetchWithTimeout(url, timeout = 5000) {
-    const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error('超时')), timeout);
+    .then(data => {
+        console.log(data);
     });
 
-    return Promise.race([
-        fetch(url),
-        timeoutPromise
-    ]);
-}
-```
-
-### Promise.any
-
-```javascript
-// 第一个成功的 Promise
-Promise.any([
-    fetch('/api/primary'),
-    fetch('/api/backup1'),
-    fetch('/api/backup2')
-])
-.then(response => {
-    console.log('第一个成功的响应');
-})
-.catch(error => {
-    // 所有都失败时的聚合错误
-    console.error('所有请求都失败了');
-});
-```
-
----
-
-## 8.3 async/await（通俗理解）
-
-### 什么是 async/await？
-
-```
-async = "异步" = 让函数变成异步函数
-await = "等待" = 等待 Promise 完成
-```
-
-**简单理解：**
-- async 修饰的函数自动返回 Promise
-- await 等待 Promise 结果
-
----
-
-### 1. async 的类型
-
-```javascript
-// async 函数的类型
-async function getData(): Promise<string> {
-    return '数据';
-    // 自动包装成 Promise.resolve('数据')
-}
-
-// 等价于
-function getData(): Promise<string> {
-    return Promise.resolve('数据');
-}
-```
-
-**async 函数返回类型：**
-
-```javascript
-// 返回字符串 → Promise<string>
-async function fn1(): Promise<string> {
-    return 'hello';
-}
-
-// 返回数字 → Promise<number>
-async function fn2(): Promise<number> {
-    return 123;
-}
-
-// 返回对象 → Promise<{ id: number }>
-async function fn3(): Promise<{ id: number }> {
-    return { id: 1 };
-}
-
-// 没有 return → Promise<void>
-async function fn4(): Promise<void> {
-    console.log('hello');
-}
-```
-
----
-
-### 2. await 的类型
-
-```javascript
-// await 等待 Promise，获取其结果
-// await 表达式 = Promise 的结果值
-
-const result = await promise;
-//      │        │          │
-//      │        │          └── 要等待的 Promise
-//      │        └── 等待并获取结果
-//      └── 结果变量
-```
-
-**await 的类型：**
-
-```javascript
-// Promise<string> await 后 → string
-const str: string = await Promise.resolve('hello');
-
-// Promise<number> await 后 → number
-const num: number = await Promise.resolve(123);
-
-// Promise<{ id: number }> await 后 → { id: number }
-const obj: { id: number } = await Promise.resolve({ id: 1 });
-```
-
----
-
-### 3. 完整例子
-
-```javascript
-// 定义一个 async 函数
-async function fetchUser(id: number): Promise<{ name: string; age: number }> {
-    // await 等待 fetch 完成
-    const response = await fetch(`/api/users/${id}`);
-    //        │
-    //        └── fetch 返回 Promise<Response>
-    //        await 后变成 Response
-
-    // 再次 await
-    const user = await response.json();
-    //              │
-    //              └── response.json() 返回 Promise<{ name: string; age: number }>
-    //              await 后变成 { name: string; age: number }
-
-    return user;
-}
-
-// 使用
-```
-
-### 4. 为什么要两个 await？
-
-```javascript
-// 完整代码
-const response = await fetch('/api/data');
-//              │
-//              └── 第1个 await：等待网络请求完成
-
-const data = await response.json();
-//              │
-//              └── 第2个 await：等待读取 body 完成
-```
-
-**为什么 `response.json()` 还需要 await？**
-
-```
-response.json() 的内部实现大概是这样的：
-
-response.json = function() {
-    // 读取 body 也是异步的！
-    return new Promise((resolve) => {
-        // 需要先把 body 读出来
-        // 这个过程是异步的
-        resolve(JSON.parse(body));
+// async/await 方式
+async function fetchData() {
+    const data = await new Promise((resolve, reject) => {
+        setTimeout(() => {
+            resolve('数据');
+        }, 1000);
     });
-};
-```
-
-**流程图：**
-
-```
-fetch('/api/data')
-    │
-    ▼ 网络请求（异步）
-Promise<Response>
-    │
-    ▼ await
-Response 对象
-    │
-    ▼
-response.json()
-    │
-    ▼ 读取 body（异步）
-Promise<any>
-    │
-    ▼ await
-实际数据
-```
-
-**简单理解：**
-
-```
-fetch() = 网络请求（异步）
-response.json() = 读取 body（也是异步！）
-```
-
-**类比：**
-
-```
-就像：
-1. 快递到了（fetch 完成）→ 需要 await
-2. 拆开包裹（json() 读取 body）→ 还需要 await
-```
-
-**完整类型标注：**
-
-```javascript
-// 完整写法
-const response: Response = await fetch('/api/data');
-//              │           │
-//              │           └── fetch(): Promise<Response>
-//              └── await 后变成 Response
-
-const data: any = await response.json();
-//              │           │
-//              │           └── response.json(): Promise<any>
-//              └── await 后变成实际数据
-```
-fetchUser(1).then(user => console.log(user));
-```
-
-**类型流程：**
-
-```
-fetchUser(1)
-    │
-    ▼
-fetch() 返回 Promise<Response>
-    │
-    ▼ await
-Response
-    │
-    ▼
-response.json() 返回 Promise<User>
-    │
-    ▼ await
-User
-    │
-    ▼ return
-Promise<User>
-```
-
----
-
-### 4. async 函数类型定义
-
-```javascript
-// async 函数的完整类型
-async function getData(): Promise<string> {
-    return 'hello';
+    console.log(data);  // 看起来像同步代码
 }
 
-// 等价的非 async 写法
-function getData(): Promise<string> {
-    return Promise.resolve('hello');
-}
+fetchData();
 ```
 
----
-
-### 5. 错误处理
+### 9.4.3 错误处理
 
 ```javascript
-// try-catch 语法
+// 使用 try...catch
 async function fetchData() {
     try {
-        // 可能失败的代码
         const response = await fetch('/api/data');
-        return await response.json();
+        const data = await response.json();
+        return data;
     } catch (error) {
-        // 失败时执行
         console.error('请求失败:', error);
-        throw error;  // 可以重新抛出
+        throw error;
     }
 }
-
-// 使用
-fetchData()
-    .then(data => console.log(data))
-    .catch(error => console.error(error));
 ```
 
----
-
-### 6. 并行执行
+### 9.4.4 并行执行
 
 ```javascript
-// 串行（慢）- 一个接一个
-async function getData() {
+// 串行：一个个等待
+async function serial() {
     const user = await fetch('/api/user').then(r => r.json());
-    // 上面完成才执行下面
     const posts = await fetch('/api/posts').then(r => r.json());
     return { user, posts };
 }
 
-// 并行（快）- 同时执行
-async function getData() {
-    const [userRes, postsRes] = await Promise.all([
+// 并行：同时请求
+async function parallel() {
+    const [userResponse, postsResponse] = await Promise.all([
         fetch('/api/user'),
         fetch('/api/posts')
     ]);
-    
-    const user = await userRes.json();
-    const posts = await postsRes.json();
-    
+    const user = await userResponse.json();
+    const posts = await postsResponse.json();
     return { user, posts };
 }
 ```
 
-### 7. 详细解释 Promise.all
-
-```javascript
-const promises = urls.map(url => fetch(url));
-const results = await Promise.all(promises);
-```
-
-**第一步：urls.map()**
-
-```javascript
-// urls 是数组
-const urls = ['/api/user', '/api/posts', '/api/comments'];
-
-// urls.map() 遍历每个 URL
-const promises = urls.map(url => fetch(url));
-//              │              │
-//              │              └── 对每个 URL 执行 fetch
-//              └── map 返回新数组
-
-// 展开：
-// promises = [
-//     fetch('/api/user'),    // Promise<Response>
-//     fetch('/api/posts'),    // Promise<Response>
-//     fetch('/api/comments') // Promise<Response>
-// ]
-
-// 类型：
-// Promise<Response>[]
-// 即：Promise<Response> 类型的数组
-```
-
-**第二步：Promise.all()**
-
-```javascript
-// Promise.all 接收 Promise 数组
-Promise.all(promises)
-//  │          │
-//  │          └── Promise<Response>[]（Promise 数组）
-//  └── 返回 Promise<Response[]>（所有结果组成的数组）
-
-// 等待所有 Promise 完成
-const results = await Promise.all(promises);
-// results 的类型：Response[]
-// 即：Response 对象的数组
-```
-
-**完整类型标注：**
-
-```javascript
-// 完整写法
-const urls: string[] = ['/api/user', '/api/posts'];
-
-// 1. map 返回 Promise<Response>[]
-const promises: Promise<Response>[] = urls.map((url: string) => fetch(url));
-
-// 2. Promise.all 返回 Promise<Response[]>
-const results: Response[] = await Promise.all(promises);
-```
-
-**流程图：**
-
-```
-urls = ['/api/user', '/api/posts']
-           │
-           ▼ map
-[fetch('/api/user'), fetch('/api/posts')]
-           │
-           │ 同时发起请求（并行！）
-           ▼
-[Promise<Response>, Promise<Response>]
-           │
-           ▼ Promise.all 等待
-[Response, Response]
-```
-
-**对比：串行 vs 并行**
-
-```javascript
-// 串行：2秒（1秒 + 1秒）
-const user = await fetch('/api/user');   // 1秒
-const posts = await fetch('/api/posts');  // 再1秒
-
-// 并行：1秒（同时）
-const [user, posts] = await Promise.all([
-    fetch('/api/user'),   // 同时发起
-    fetch('/api/posts')   // 同时发起
-]);
-```
-
 ---
 
-### 7. 一句话总结
+## 9.5 实践练习
 
-```
-async 函数 = 自动返回 Promise 的函数
-await = 等待 Promise 结果的语法
-```
-
----
-
-## 8.4 实用技巧
-
-### 封装请求
+### 练习 1：Promise 基础
 
 ```javascript
-// request.js
-const request = {
-    base: '/api',
-
-    async get(url, params = {}) {
-        const query = new URLSearchParams(params);
-        const res = await fetch(`${this.base}/${url}?${query}`);
-        return this.handle(res);
-    },
-
-    async post(url, data = {}) {
-        const res = await fetch(`${this.base}/${url}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
-        });
-        return this.handle(res);
-    },
-
-    async handle(res) {
-        if (!res.ok) {
-            throw new Error(`HTTP ${res.status}`);
-        }
-        return res.json();
-    }
-};
-
-// 使用
-const users = await request.get('/users');
-```
-
-### 重试机制
-
-```javascript
-async function fetchWithRetry(url, options = {}, maxRetries = 3) {
-    for (let i = 0; i < maxRetries; i++) {
-        try {
-            const res = await fetch(url, options);
-            if (!res.ok) throw new Error(`HTTP ${res.status}`);
-            return await res.json();
-        } catch (error) {
-            if (i === maxRetries - 1) throw error;
-            // 指数退避
-            await new Promise(r => setTimeout(r, Math.pow(2, i) * 1000));
-        }
-    }
-}
-```
-
-### 并发限制
-
-```javascript
-class TaskQueue {
-    constructor(concurrency) {
-        this.concurrency = concurrency;
-        this.queue = [];
-        this.running = 0;
-    }
-
-    add(task) {
-        return new Promise((resolve, reject) => {
-            this.queue.push({ task, resolve, reject });
-            this.run();
-        });
-    }
-
-    async run() {
-        while (this.running < this.concurrency && this.queue.length) {
-            const { task, resolve, reject } = this.queue.shift();
-            this.running++;
-            try {
-                const result = await task();
-                resolve(result);
-            } catch (error) {
-                reject(error);
-            } finally {
-                this.running--;
-                this.run();
-            }
-        }
-    }
+// 1.1 创建 Promise
+function delay(ms) {
+    return new Promise(resolve => {
+        setTimeout(resolve, ms);
+    });
 }
 
-// 使用
-const queue = new TaskQueue(2);
-queue.add(() => download(1));
-queue.add(() => download(2));
-queue.add(() => download(3));
-```
-
----
-
-## 8.5 实践练习
-
-### 练习 1：图片加载器
-
-```javascript
-class ImageLoader {
-    constructor() {
-        this.cache = new Map();
-    }
-
-    async load(src) {
-        if (this.cache.has(src)) {
-            return this.cache.get(src);
-        }
-
-        return new Promise((resolve, reject) => {
-            const img = new Image();
-            img.onload = () => {
-                this.cache.set(src, img);
-                resolve(img);
-            };
-            img.onerror = () => reject(new Error(`加载失败：${src}`));
-            img.src = src;
-        });
-    }
-
-    async loadAll(sources) {
-        return Promise.allSettled(
-            sources.map(src => this.load(src))
-        );
-    }
-}
-
-// 使用
-const loader = new ImageLoader();
-const images = await loader.loadAll(['a.jpg', 'b.jpg', 'c.jpg']);
-```
-
-### 练习 2：延迟队列
-
-```javascript
-class DelayQueue {
-    constructor() {
-        this.queue = [];
-        this.processing = false;
-    }
-
-    add(task, delay) {
-        return new Promise((resolve) => {
-            this.queue.push({ task, delay, resolve });
-            this.process();
-        });
-    }
-
-    async process() {
-        if (this.processing || this.queue.length === 0) return;
-
-        this.processing = true;
-
-        while (this.queue.length > 0) {
-            const { task, delay, resolve } = this.queue.shift();
-            await new Promise(r => setTimeout(r, delay));
-            const result = await task();
-            resolve(result);
-        }
-
-        this.processing = false;
-    }
-}
-
-// 使用
-const queue = new DelayQueue();
-queue.add(() => console.log('任务 1'), 1000);
-queue.add(() => console.log('任务 2'), 2000);
-```
-
-### 练习 3：取消请求
-
-```javascript
-class CancelablePromise {
-    constructor(executor) {
-        this.cancel = () => {};
-        this.promise = new Promise((resolve, reject) => {
-            this.cancel = reject;
-            executor(resolve, reject, this.cancel);
-        });
-    }
-
-    then(...args) {
-        return this.promise.then(...args);
-    }
-
-    catch(...args) {
-        return this.promise.catch(...args);
-    }
-}
-
-// 使用
-const request = new CancelablePromise((resolve, reject, cancel) => {
-    const controller = new AbortController();
-    cancel = () => controller.abort();
-
-    fetch('/api/data', { signal: controller.signal })
-        .then(resolve)
-        .catch(reject);
+delay(1000).then(() => {
+    console.log('1秒后执行');
 });
 
-// 取消
-request.cancel();
+// 1.2 链式调用
+Promise.resolve(1)
+    .then(x => x + 1)
+    .then(x => x * 2)
+    .then(x => console.log(x));  // 4
 ```
 
----
-
-## 8.6 常见问答
-
-### Q1: Promise 和 async/await 如何选择？
-
-**答：** 推荐优先使用 async/await，但以下情况用 Promise：
-- 并发执行（Promise.all）
-- 竞争执行（Promise.race）
-- 库的 API 返回 Promise
-
-### Q2: async/await 可以循环中使用吗？
+### 练习 2：async/await
 
 ```javascript
-// 串行（一个接一个）
-for (const url of urls) {
-    const res = await fetch(url);  // 等待完成
+// 2.1 async 函数
+async function greet() {
+    return '你好';
 }
 
-// 并行（同时）
-const promises = urls.map(url => fetch(url));
-const results = await Promise.all(promises);
+greet().then(message => console.log(message));  // 你好
+
+// 2.2 await 使用
+function wait(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function example() {
+    console.log('开始');
+    await wait(1000);
+    console.log('1秒后');
+}
+
+example();
 ```
 
-### Q3: 顶层 await 是什么？
-
-**答：** 在 ES Module 顶层可以直接使用 await。
+### 练习 3：错误处理
 
 ```javascript
-// ES Module
-const data = await fetch('/api/data').then(r => r.json());
-export default data;
+// 3.1 try...catch
+async function safeFetch(url) {
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('请求失败:', error);
+        return null;
+    }
+}
 ```
 
 ---
 
-## 8.7 学习资源
+## 9.6 常见问答
+
+### Q1: Promise 和 async/await 哪个好？
+
+**答：** 功能相同，async/await 更简洁。
+
+```javascript
+// Promise
+fetchData()
+    .then(data => process(data))
+    .catch(error => console.error(error));
+
+// async/await（更易读）
+async function main() {
+    try {
+        const data = await fetchData();
+        await process(data);
+    } catch (error) {
+        console.error(error);
+    }
+}
+```
+
+### Q2: async 函数总是返回 Promise 吗？
+
+```javascript
+// 是的，async 函数总是返回 Promise
+async function fn() {
+    return 'hello';
+}
+
+fn().then(console.log);  // 'hello'
+
+// 即使返回非 Promise 值，也会被包装成 Promise
+async function fn2() {
+    return 'hello';
+}
+```
+
+### Q3: await 可以在循环中使用吗？
+
+```javascript
+// 可以，但要注意性能
+async function processItems(items) {
+    for (const item of items) {
+        await process(item);  // 串行处理
+    }
+}
+
+// 如果可以并行：
+async function processItems(items) {
+    await Promise.all(items.map(item => process(item)));
+}
+```
+
+---
+
+## 9.7 学习资源
+
+### 官方文档
 
 - [MDN - Promise](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Promise)
-- [MDN - async/await](https://developer.mozilla.org/zh-CN/docs/Learn/JavaScript/Asynchronous/Async_await)
+- [MDN - async function](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Statements/async_function)
+
+### 推荐教程
+
+- [ES6 入门教程 - 阮一峰](https://es6.ruanyifeng.com/#docs/promise)
 - [JavaScript.info - Promise](https://zh.javascript.info/promise-basics)
 
 ---
 
-**上一章：** [← 08-Class 类与继承](./08-Class 类与继承.md)
+**上一章：** [← 08-Class 类与继承](./08-Class%20类与继承.md)  
 **下一章：** [→ 10-生成器与迭代器](./10-生成器与迭代器.md)

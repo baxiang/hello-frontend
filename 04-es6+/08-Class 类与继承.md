@@ -1,72 +1,146 @@
 # Class 类与继承
 
+> 从零开始理解 ES6 的面向对象编程
+
 ## 学习目标
-- 掌握 class 基础语法
-- 理解静态方法和 getter/setter
-- 掌握 extends 和 super 的使用
-- 理解原型链与 class 的关系
+
+- ✅ 掌握 class 基础语法
+- ✅ 理解静态方法和 getter/setter
+- ✅ 掌握 extends 和 super 的使用
+- ✅ 理解原型链与 class 的关系
 
 ---
 
-## 6.0 通俗理解 Class
+## 8.0 为什么要学 Class？
 
-### 什么是 Class？
+### 8.0.1 故事背景
 
-```
-Class = "类" = 对象的"模板"
-
-就像：
-- 蓝图：定义了房子长什么样
-- Class：定义了对象有什么属性和方法
-- new：按照蓝图造房子
-```
-
-### Class vs 构造函数
+在 ES6 之前，JavaScript 使用构造函数和原型来实现面向对象：
 
 ```javascript
-// 构造函数（老方式）
-function Person(name) {
+// 构造函数
+function Person(name, age) {
     this.name = name;
+    this.age = age;
 }
-Person.prototype.sayHi = function() { };
 
-// Class（新方式）
-class Person {
-    constructor(name) {
-        this.name = name;
-    }
-    sayHi() { }
-}
-// 效果一样，但更简洁！
+// 原型方法
+Person.prototype.sayHi = function() {
+    console.log('你好，我叫' + this.name);
+};
+
+// 创建实例
+const person = new Person('张三', 25);
+person.sayHi();
 ```
 
-### 核心概念
+这种方式：
+1. 语法繁琐
+2. 继承实现复杂
+3. 可读性差
 
-| 概念 | 通俗理解 |
-|------|----------|
-| class | 模板/蓝图 |
-| constructor | 构造函数（创建时调用） |
-| new | 按模板造对象 |
-| extends | 继承/父子关系 |
-| super | 调用父类方法 |
+### 8.0.2 Class 的优势
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    Class 的优势                             │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  1. 语法更简洁                                              │
+│     → 更像传统面向对象语言                                   │
+│                                                             │
+│  2. 继承更简单                                              │
+│     → 使用 extends 和 super 关键字                           │
+│                                                             │
+│  3. 更清晰的结构                                            │
+│     → constructor、方法、静态方法分开了                     │
+│                                                             │
+│  4. 内置 getter/setter                                      │
+│     → 更方便地控制属性访问                                   │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### 8.0.3 本章学习路径
+
+```
+第一步：Class 基础语法（如何定义类）
+    ↓
+第二步：实例方法和静态方法（方法的类型）
+    ↓
+第三步：getter 和 setter（计算属性）
+    ↓
+第四步：继承（extends 和 super）
+    ↓
+第五步：私有字段（真正的私有属性）
+```
 
 ---
 
-## 6.1 class 基础
+## 8.1 Class 基础详解
 
-### 基本语法
+### 8.1.1 基本语法
 
 ```javascript
-// 构造函数方式
+// 定义类
+class Person {
+    // 构造函数
+    constructor(name, age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    // 实例方法
+    sayHi() {
+        console.log('你好，我叫' + this.name);
+    }
+
+    // 描述
+    describe() {
+        return this.name + '，' + this.age + '岁';
+    }
+}
+
+// 创建实例
+const person = new Person('张三', 25);
+
+console.log(person.name);  // '张三'
+console.log(person.age);   // 25
+person.sayHi();            // 你好，我叫张三
+```
+
+**语法图解：**
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  class Person {                                            │
+│      constructor(name, age) {  ← 构造函数，初始化         │
+│          this.name = name;                                 │
+│          this.age = age;                                   │
+│      }                                                      │
+│                                                             │
+│      sayHi() {  ← 实例方法，所有实例共享                   │
+│          console.log('...');                               │
+│      }                                                      │
+│  }                                                          │
+│                                                             │
+│  const person = new Person('张三', 25);  ← 创建实例        │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### 8.1.2 Class vs 构造函数
+
+```javascript
+// 构造函数方式（ES5）
 function Person(name, age) {
     this.name = name;
     this.age = age;
 }
 Person.prototype.sayHi = function() {
-    console.log(`Hi, I'm ${this.name}`);
+    console.log('你好，我叫' + this.name);
 };
 
-// class 方式
+// Class 方式（ES6）
 class Person {
     constructor(name, age) {
         this.name = name;
@@ -74,45 +148,60 @@ class Person {
     }
 
     sayHi() {
-        console.log(`Hi, I'm ${this.name}`);
+        console.log('你好，我叫' + this.name);
     }
 }
 
-// 使用
-const person = new Person('张三', 25);
-person.sayHi();  // 'Hi, I'm 张三'
+// 使用方式相同
+const p1 = new Person('张三', 25);
+const p2 = new Person('李四', 30);
+
+p1.sayHi();
+p2.sayHi();
 ```
 
-### 类表达式
+### 8.1.3 类表达式
 
 ```javascript
 // 匿名类表达式
-const MyClass = class {
+const Person = class {
+    constructor(name) {
+        this.name = name;
+    }
     sayHi() {
-        console.log('Hi');
+        console.log('你好');
     }
 };
 
 // 命名类表达式
-const MyClass = class NamedClass {
-    sayHi() {
-        console.log('Hi');
+const MyPerson = class NamedClass {
+    constructor(name) {
+        this.name = name;
+    }
+    getClassName() {
+        return NamedClass.name;  // 'NamedClass'
     }
 };
-
-// 立即执行的类
-const instance = new class {
-    sayHi() {
-        console.log('Hi');
-    }
-}();
 ```
 
 ---
 
-## 6.2 静态方法
+## 8.2 静态方法详解
 
-### 定义和使用
+### 8.2.1 什么是静态方法？
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  静态方法 = 类的方法，不是实例的方法                         │
+│                                                             │
+│  特点：                                                     │
+│  - 通过类名调用，不需要创建实例                             │
+│  - 静态方法中的 this 指向类本身                             │
+│  - 常用于工具函数、工厂方法                                  │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### 8.2.2 基本语法
 
 ```javascript
 class MathUtils {
@@ -126,113 +215,189 @@ class MathUtils {
         return a * b;
     }
 
-    // 静态方法调用其他静态方法
+    // 静态方法可以调用静态方法
     static square(x) {
-        return this.multiply(x, x);
+        return this.multiply(x, x);  // this = MathUtils
     }
 }
 
-// 静态方法通过类调用
+// 调用静态方法
 console.log(MathUtils.multiply(3, 4));  // 12
-console.log(MathUtils.square(5));       // 25
+console.log(MathUtils.square(5));        // 25
 
 // 实例无法调用静态方法
 const utils = new MathUtils();
 // utils.multiply(3, 4);  // TypeError
 ```
 
-### 静态属性
+### 8.2.3 实际应用场景
 
 ```javascript
-// ES2022 支持静态字段
-class MyClass {
-    static count = 0;
-    static config = {
-        debug: true,
-        version: '1.0.0'
-    };
-
-    constructor() {
-        MyClass.count++;
+// 场景 1：工厂方法
+class User {
+    constructor(name, role) {
+        this.name = name;
+        this.role = role;
     }
 
-    static getCount() {
-        return MyClass.count;
+    static createAdmin(name) {
+        return new User(name, 'admin');
+    }
+
+    static createGuest(name) {
+        return new User(name, 'guest');
     }
 }
 
-console.log(MyClass.config.version);  // '1.0.0'
+const admin = User.createAdmin('张三');
+const guest = User.createGuest('李四');
+
+// 场景 2：工具方法
+class StringUtils {
+    static capitalize(str) {
+        return str.charAt(0).toUpperCase() + str.slice(1);
+    }
+
+    static reverse(str) {
+        return str.split('').reverse().join('');
+    }
+}
+
+console.log(StringUtils.capitalize('hello'));  // 'Hello'
+console.log(StringUtils.reverse('hello'));    // 'olleh'
 ```
 
 ---
 
-## 6.3 getter 和 setter
+## 8.3 getter 和 setter
 
-### 基本用法
+### 8.3.1 什么是 getter/setter？
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  getter 和 setter = 计算属性                                │
+│                                                             │
+│  getter：获取属性时执行的代码                                │
+│  setter：设置属性时执行的代码                                │
+│                                                             │
+│  用途：                                                     │
+│  - 数据验证                                                │
+│  - 计算属性                                                │
+│  - 隐藏内部实现                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### 8.3.2 基本语法
 
 ```javascript
 class Person {
-    constructor(name, age) {
-        this._name = name;
-        this._age = age;
+    constructor(name) {
+        this._name = name;  // 私有属性（约定用下划线）
     }
 
-    // getter
+    // getter：读取 name 时执行
     get name() {
+        console.log('获取 name');
         return this._name;
     }
 
-    // setter
+    // setter：设置 name 时执行
     set name(value) {
-        if (value) {
-            this._name = value;
-        }
+        console.log('设置 name 为', value);
+        this._name = value;
+    }
+}
+
+const person = new Person('张三');
+
+console.log(person.name);  // '获取 name' + '张三'
+person.name = '李四';      // '设置 name 为 李四'
+```
+
+### 8.3.3 实际应用
+
+```javascript
+// 应用 1：数据验证
+class User {
+    constructor(age) {
+        this.age = age;
     }
 
-    // getter
     get age() {
         return this._age;
     }
 
-    // setter（带验证）
     set age(value) {
         if (value < 0 || value > 150) {
             throw new Error('年龄必须在 0-150 之间');
         }
         this._age = value;
     }
+}
 
-    // 计算属性
-    get info() {
-        return `${this._name}, ${this._age}岁`;
+const user = new User(25);
+user.age = 30;  // OK
+// user.age = -1;  // 抛出错误
+
+// 应用 2：计算属性
+class Rectangle {
+    constructor(width, height) {
+        this.width = width;
+        this.height = height;
+    }
+
+    // 计算属性：面积
+    get area() {
+        return this.width * this.height;
+    }
+
+    // 计算属性：周长
+    get perimeter() {
+        return 2 * (this.width + this.height);
     }
 }
 
-// 使用
-const person = new Person('张三', 25);
-console.log(person.name);  // '张三'（调用 getter）
-person.name = '李四';       // 调用 setter
-console.log(person.info);  // '李四，25 岁'
+const rect = new Rectangle(10, 5);
+console.log(rect.area);      // 50
+console.log(rect.perimeter); // 30
 ```
 
 ---
 
-## 6.4 继承
+## 8.4 继承详解
 
-### extends 和 super
+### 8.4.1 什么是继承？
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  继承 = "父子关系"                                          │
+│                                                             │
+│  子类继承父类：                                             │
+│  - 可以使用父类的属性和方法                                  │
+│  - 可以重写父类的方法                                        │
+│  - 可以添加自己的新方法                                      │
+│                                                             │
+│  关键字：                                                   │
+│  - extends：声明继承关系                                    │
+│  - super：调用父类                                         │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### 8.4.2 基本语法
 
 ```javascript
+// 父类
 class Animal {
     constructor(name) {
         this.name = name;
     }
 
     speak() {
-        console.log(`${this.name} makes a sound`);
+        console.log(this.name + ' makes a sound');
     }
 }
 
-// 继承
+// 子类
 class Dog extends Animal {
     constructor(name, breed) {
         // 调用父类构造函数
@@ -242,369 +407,310 @@ class Dog extends Animal {
 
     // 重写父类方法
     speak() {
-        console.log(`${this.name} barks`);
+        console.log(this.name + ' barks');
     }
 
-    // 调用父类方法
-    speakWithParent() {
-        super.speak();  // 'DogName makes a sound'
-        this.speak();   // 'DogName barks'
+    // 新增方法
+    fetch() {
+        console.log(this.name + ' fetches the ball');
     }
 }
 
 const dog = new Dog('旺财', '金毛');
-dog.speak();           // '旺财 barks'
-dog.speakWithParent(); // '旺财 makes a sound' + '旺财 barks'
+dog.speak();     // '旺财 barks'（重写后的方法）
+dog.fetch();     // '旺财 fetches the ball'（子类新方法）
 ```
 
-### 子类中的 super
+### 8.4.3 super 的使用
 
 ```javascript
 class Parent {
-    getName() {
-        return 'Parent';
+    constructor(name) {
+        this.name = name;
+    }
+
+    greet() {
+        return '你好，我是' + this.name;
+    }
+
+    static staticMethod() {
+        return '父类的静态方法';
     }
 }
 
 class Child extends Parent {
-    getName() {
-        return 'Child';
+    constructor(name, age) {
+        super(name);  // 调用父类构造函数
+        this.age = age;
     }
 
-    getParentName() {
-        return super.getName();  // 'Parent'
+    greet() {
+        // 调用父类方法
+        const parentGreeting = super.greet();
+        return parentGreeting + '，今年' + this.age + '岁';
+    }
+
+    static staticMethod() {
+        // 调用父类静态方法
+        return super.staticMethod() + '的扩展';
     }
 }
 
-// super 也用于访问父类的 getter/setter
-class Rectangle {
-    constructor(width, height) {
-        this._width = width;
-        this._height = height;
-    }
+const child = new Child('张三', 25);
+console.log(child.greet());  // 你好，我是张三，今年25岁
+```
 
-    get area() {
-        return this._width * this._height;
+### 8.4.4 原型链
+
+```javascript
+class Animal {
+    constructor(name) {
+        this.name = name;
+    }
+    speak() {
+        console.log('动物叫声');
     }
 }
 
-class Square extends Rectangle {
-    constructor(side) {
-        super(side, side);
-    }
-
-    // 重写 area getter
-    get area() {
-        return super.area * 2;  // 可以使用 super 访问父类 getter
+class Dog extends Animal {
+    speak() {
+        console.log('狗叫声');
     }
 }
+
+const dog = new Dog('旺财');
+
+console.log(dog instanceof Dog);      // true
+console.log(dog instanceof Animal);    // true
+console.log(dog instanceof Object);    // true
+
+// 原型链：dog → Dog.prototype → Animal.prototype → Object.prototype → null
 ```
 
 ---
 
-## 6.5 私有字段
+## 8.5 私有字段（ES2022）
 
-### ES2022 私有字段
+### 8.5.1 什么是私有字段？
 
 ```javascript
+// 传统方式：约定私有（不真正私有）
 class Person {
-    // 私有字段
-    #name;
-    #age;
-
-    constructor(name, age) {
-        this.#name = name;
-        this.#age = age;
+    constructor(name) {
+        this._name = name;  // 下划线表示私有
     }
+}
 
-    // 私有方法
-    #validate() {
-        return this.#age > 0;
+const person = new Person('张三');
+console.log(person._name);  // 可以访问，但不规范
+
+// 私有字段：真正的私有
+class Person {
+    #name;  // 私有字段
+
+    constructor(name) {
+        this.#name = name;
     }
 
     getName() {
         return this.#name;
     }
-
-    getAge() {
-        if (this.#validate()) {
-            return this.#age;
-        }
-    }
 }
 
-const person = new Person('张三', 25);
+const person = new Person('张三');
 console.log(person.getName());  // '张三'
-// console.log(person.#name);   // SyntaxError（外部无法访问）
+// console.log(person.#name);  // 语法错误！无法直接访问
 ```
 
-### 私有字段继承
+### 8.5.2 私有字段的使用
 
 ```javascript
-class Parent {
-    #secret = 'parent secret';
+class BankAccount {
+    #balance = 0;
 
-    getSecret() {
-        return this.#secret;
+    constructor(initialBalance) {
+        if (initialBalance > 0) {
+            this.#balance = initialBalance;
+        }
+    }
+
+    deposit(amount) {
+        if (amount > 0) {
+            this.#balance += amount;
+            return true;
+        }
+        return false;
+    }
+
+    withdraw(amount) {
+        if (amount > 0 && amount <= this.#balance) {
+            this.#balance -= amount;
+            return true;
+        }
+        return false;
+    }
+
+    getBalance() {
+        return this.#balance;
     }
 }
 
-class Child extends Parent {
-    #secret = 'child secret';
-
-    getChildSecret() {
-        return this.#secret;
-    }
-}
-
-const child = new Child();
-console.log(child.getSecret());    // 'parent secret'
-console.log(child.getChildSecret()); // 'child secret'
+const account = new BankAccount(1000);
+console.log(account.getBalance());  // 1000
+account.deposit(500);
+console.log(account.getBalance());  // 1500
+// account.#balance  // 语法错误，无法直接访问
 ```
 
 ---
 
-## 6.6 实践练习
+## 8.6 实践练习
 
-### 练习 1：事件发射器
+### 练习 1：基础 Class
 
 ```javascript
-class EventEmitter {
-    constructor() {
-        this.events = new Map();
+// 1.1 创建 User 类
+class User {
+    constructor(name, email) {
+        this.name = name;
+        this.email = email;
     }
 
-    on(event, listener) {
-        if (!this.events.has(event)) {
-            this.events.set(event, []);
-        }
-        this.events.get(event).push(listener);
-        return this;
-    }
-
-    off(event, listener) {
-        const listeners = this.events.get(event);
-        if (listeners) {
-            const index = listeners.indexOf(listener);
-            if (index > -1) {
-                listeners.splice(index, 1);
-            }
-        }
-        return this;
-    }
-
-    emit(event, ...args) {
-        const listeners = this.events.get(event);
-        if (listeners) {
-            listeners.forEach(listener => listener(...args));
-        }
-        return true;
-    }
-
-    once(event, listener) {
-        const wrapper = (...args) => {
-            listener(...args);
-            this.off(event, wrapper);
-        };
-        return this.on(event, wrapper);
+    introduce() {
+        return `你好，我是${this.name}`;
     }
 }
 
-// 使用
-const emitter = new EventEmitter();
-emitter.on('message', msg => console.log(msg));
-emitter.emit('message', 'Hello');
+const user = new User('张三', 'zhang@example.com');
+console.log(user.introduce());  // 你好，我是张三
 ```
 
-### 练习 2：栈和队列
+### 练习 2：继承
 
 ```javascript
-// 栈（LIFO）
-class Stack {
-    constructor() {
-        this.items = [];
+// 2.1 创建 Animal 和 Dog 类
+class Animal {
+    constructor(name) {
+        this.name = name;
     }
 
-    push(item) {
-        this.items.push(item);
-    }
-
-    pop() {
-        return this.items.pop();
-    }
-
-    peek() {
-        return this.items[this.items.length - 1];
-    }
-
-    isEmpty() {
-        return this.items.length === 0;
-    }
-
-    get size() {
-        return this.items.length;
+    speak() {
+        console.log(`${this.name} 发出了声音`);
     }
 }
-
-// 队列（FIFO）
-class Queue {
-    constructor() {
-        this.items = [];
-    }
-
-    enqueue(item) {
-        this.items.push(item);
-    }
-
-    dequeue() {
-        return this.items.shift();
-    }
-
-    front() {
-        return this.items[0];
-    }
-
-    isEmpty() {
-        return this.items.length === 0;
-    }
-}
-
-// 使用
-const stack = new Stack();
-stack.push(1);
-stack.push(2);
-console.log(stack.pop());  // 2
-
-const queue = new Queue();
-queue.enqueue(1);
-queue.enqueue(2);
-console.log(queue.dequeue());  // 1
-```
-
-### 练习 3：工具类
-
-```javascript
-class StringUtils {
-    // 静态工具方法
-    static capitalize(str) {
-        return str.charAt(0).toUpperCase() + str.slice(1);
-    }
-
-    static truncate(str, length) {
-        return str.length > length ? str.slice(0, length) + '...' : str;
-    }
-
-    static slugify(str) {
-        return str.toLowerCase()
-            .replace(/\s+/g, '-')
-            .replace(/[^\w-]+/g, '');
-    }
-
-    static isPalindrome(str) {
-        const clean = str.toLowerCase().replace(/\W/g, '');
-        return clean === clean.split('').reverse().join('');
-    }
-}
-
-// 使用
-console.log(StringUtils.capitalize('hello'));  // 'Hello'
-console.log(StringUtils.truncate('这是一段很长的文字', 5));  // '这是一段很...'
-console.log(StringUtils.slugify('Hello World'));  // 'hello-world'
-console.log(StringUtils.isPalindrome('A man a plan a canal Panama'));  // true
-```
-
----
-
-## 6.7 常见问答
-
-### Q1: class 和构造函数有什么区别？
-
-| 特性 | class | 构造函数 |
-|------|-------|----------|
-| 提升 | ❌ 不提升 | ✅ 提升 |
-| 严格模式 | 自动 | 需要手动 |
-| 不可枚举 | ✅ | ❌ |
-| 必须 new | ✅ | ❌ |
-
-### Q2: 箭头函数能作为类方法吗？
-
-**答：** 可以，但 this 绑定不同。
-
-```javascript
-class MyClass {
-    // 普通方法
-    normalMethod() {
-        console.log(this);  // 指向实例
-    }
-
-    // 箭头函数方法
-    arrowMethod = () => {
-        console.log(this);  // 也指向实例（绑定在构造函数中）
-    }
-}
-```
-
-### Q3: 如何实现 mixin？
-
-```javascript
-// mixin 模式
-const canEat = {
-    eat() {
-        console.log(`${this.name} is eating`);
-        return this;
-    }
-};
-
-const canWalk = {
-    walk() {
-        console.log(`${this.name} is walking`);
-        return this;
-    }
-};
-
-class Animal {}
-Object.assign(Animal.prototype, canEat, canWalk);
 
 class Dog extends Animal {
-    constructor(name) {
-        super();
-        this.name = name;
+    speak() {
+        console.log(`${this.name} 汪汪叫`);
     }
 }
 
 const dog = new Dog('旺财');
-dog.eat().walk();
+dog.speak();  // 旺财 汪汪叫
 ```
 
-### Q4: class 能继承内置类型吗？
-
-**答：** 可以。
+### 练习 3：getter/setter
 
 ```javascript
-class MyArray extends Array {
-    last() {
-        return this[this.length - 1];
+// 3.1 创建带验证的 Temperature 类
+class Temperature {
+    constructor(celsius) {
+        this.celsius = celsius;
     }
 
-    first() {
-        return this[0];
+    get celsius() {
+        return this._celsius;
+    }
+
+    set celsius(value) {
+        this._celsius = value;
+    }
+
+    get fahrenheit() {
+        return this._celsius * 9 / 5 + 32;
+    }
+
+    set fahrenheit(value) {
+        this._celsius = (value - 32) * 5 / 9;
     }
 }
 
-const arr = new MyArray(1, 2, 3);
-console.log(arr.last());  // 3
-console.log(arr.first()); // 1
+const temp = new Temperature(25);
+console.log(temp.celsius);     // 25
+console.log(temp.fahrenheit);   // 77
+temp.fahrenheit = 100;
+console.log(temp.celsius);     // 37.777...
 ```
 
 ---
 
-## 6.8 学习资源
+## 8.7 常见问答
 
-- [MDN - Class](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Classes)
-- [ES6 入门教程 - Class](https://es6.ruanyifeng.com/#docs/class)
-- [JavaScript.info - Class](https://zh.javascript.info/classes)
+### Q1: Class 和构造函数哪个好？
+
+**答：** Class 更清晰、更易读，推荐使用 Class。
+
+```javascript
+// 推荐
+class Person {
+    constructor(name) {
+        this.name = name;
+    }
+}
+
+// 构造函数仍然可用，但不如 Class 清晰
+function Person(name) {
+    this.name = name;
+}
+```
+
+### Q2: super 必须在 constructor 的第一行调用吗？
+
+```javascript
+// 是的
+class Child extends Parent {
+    constructor() {
+        // super() 必须在 this 之前调用
+        super();
+        this.name = '张三';  // 这行在 super() 之后
+    }
+}
+```
+
+### Q3: 私有字段和 Symbol 哪个好？
+
+```javascript
+// 私有字段（推荐）
+class Person {
+    #name;
+}
+
+// Symbol（不推荐，无法真正私有）
+const _name = Symbol('name');
+class Person {
+    constructor(name) {
+        this[_name] = name;
+    }
+}
+
+// 私有字段是语言级别的支持，更可靠
+```
 
 ---
 
-**上一章：** [← 07-函数进阶](./07-函数进阶.md)
-**下一章：** [→ 09-Promise 与 async/await](./09-Promise-async-await.md)
+## 8.8 学习资源
+
+### 官方文档
+
+- [MDN - class](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Statements/class)
+- [MDN - extends](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Classes/extends)
+
+### 推荐教程
+
+- [ES6 入门教程 - 阮一峰](https://es6.ruanyifeng.com/#docs/class)
+- [JavaScript.info - Class](https://zh.javascript.info/class)
+
+---
+
+**上一章：** [← 07-函数进阶](./07-函数进阶.md)  
+**下一章：** [→ 09-Promise-async-await](./09-Promise-async-await.md)
