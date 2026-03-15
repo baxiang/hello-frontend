@@ -1,231 +1,332 @@
 # HTTP 与 Web 开发
 
+> 掌握 HTTP 协议和 Express 框架，构建 Web 服务和 RESTful API
+
 ## 学习目标
-- 掌握原生 HTTP 模块的使用
-- 学会使用 Express 构建 Web 服务
-- 理解路由和中间件的工作原理
-- 能够设计 RESTful API
+
+- ✅ 掌握原生 HTTP 模块的使用
+- ✅ 学会使用 Express 构建 Web 服务
+- ✅ 理解路由和中间件的工作原理
+- ✅ 能够设计 RESTful API
 
 ---
 
-## 2.1 原生 HTTP 模块
+## 2.1 什么是 HTTP？
 
-### 创建服务器
+### 2.1.1 HTTP 简介
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  HTTP = 超文本传输协议                                       │
+│                                                             │
+│  就像：                                                     │
+│  - 快递公司：负责运输货物（数据）                            │
+│  - 邮政系统：负责寄送信件（请求/响应）                       │
+│  - 餐厅服务员：记录点餐和上菜（请求和响应）                  │
+│                                                             │
+│  工作流程：                                                 │
+│  1. 客户端（浏览器）发起请求                                 │
+│  2. 服务器处理请求                                          │
+│  3. 服务器返回响应                                          │
+│  4. 客户端显示结果                                          │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### 2.1.2 HTTP 请求方法
+
+| 方法 | 说明 | 用途 |
+|------|------|------|
+| GET | 获取数据 | 浏览网页、查询数据 |
+| POST | 创建数据 | 注册用户、提交表单 |
+| PUT | 完整更新 | 更新整个资源 |
+| PATCH | 部分更新 | 更新部分字段 |
+| DELETE | 删除数据 | 删除用户、删除文章 |
+
+**生活例子：**
+
+```
+GET    → 图书馆借书（只看不拿走）
+POST   → 图书馆办新卡（创建新身份）
+PUT    → 图书馆换整本书（完整替换）
+PATCH  → 图书馆续借（部分更新）
+DELETE → 图书馆注销卡（删除身份）
+```
+
+### 2.1.3 HTTP 状态码
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  状态码 = 服务器的"回复语"                                  │
+│                                                             │
+│  1xx - 信息响应                                             │
+│  - 100: 继续请求                                            │
+│                                                             │
+│  2xx - 成功响应                                             │
+│  - 200: 成功                                                │
+│  - 201: 已创建                                              │
+│  - 204: 无内容                                              │
+│                                                             │
+│  3xx - 重定向                                               │
+│  - 301: 永久重定向                                          │
+│  - 302: 临时重定向                                          │
+│                                                             │
+│  4xx - 客户端错误                                           │
+│  - 400: 请求错误                                            │
+│  - 401: 未授权                                              │
+│  - 403: 禁止访问                                            │
+│  - 404: 未找到                                              │
+│                                                             │
+│  5xx - 服务器错误                                           │
+│  - 500: 服务器内部错误                                       │
+│  - 503: 服务不可用                                          │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 2.2 原生 HTTP 模块
+
+### 2.2.1 创建服务器
 
 ```javascript
 const http = require('http');
 
+// 创建服务器
 const server = http.createServer((req, res) => {
+    // req = 请求对象（客户端发来的）
+    // res = 响应对象（我们要返回的）
+    
     // 设置响应头
     res.statusCode = 200;
     res.setHeader('Content-Type', 'application/json');
-
+    
     // 发送响应
     res.end(JSON.stringify({ message: 'Hello World' }));
 });
 
+// 监听端口
 server.listen(3000, () => {
     console.log('服务器运行在 http://localhost:3000');
 });
 ```
 
-### 处理不同路由
+### 2.2.2 请求对象详解
 
 ```javascript
 const http = require('http');
 
 const server = http.createServer((req, res) => {
-    const url = req.url;
+    // 请求方法
+    console.log(req.method);  // GET, POST, PUT, DELETE
+    
+    // 请求 URL
+    console.log(req.url);  // /api/users
+    
+    // 请求头
+    console.log(req.headers);
+    // {
+    //   'host': 'localhost:3000',
+    //   'content-type': 'application/json',
+    //   'authorization': 'Bearer token'
+    // }
+    
+    // 请求体（需要监听 data 事件）
+    let body = '';
+    req.on('data', chunk => {
+        body += chunk.toString();
+    });
+    req.on('end', () => {
+        const data = JSON.parse(body);
+        console.log(data);
+    });
+    
+    res.end('OK');
+});
+
+server.listen(3000);
+```
+
+### 2.2.3 处理不同路由
+
+```javascript
+const http = require('http');
+const url = require('url');
+
+const server = http.createServer((req, res) => {
+    // 解析 URL
+    const parsedUrl = url.parse(req.url, true);
+    const pathname = parsedUrl.pathname;
+    const query = parsedUrl.query;
     const method = req.method;
-
+    
+    // 设置通用响应头
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    
     // 路由判断
-    if (url === '/' && method === 'GET') {
+    if (pathname === '/' && method === 'GET') {
         res.statusCode = 200;
-        res.setHeader('Content-Type', 'text/plain');
-        res.end('首页');
-    } else if (url === '/api/users' && method === 'GET') {
+        res.end(JSON.stringify({ message: '欢迎来到首页' }));
+        
+    } else if (pathname === '/api/users' && method === 'GET') {
         res.statusCode = 200;
-        res.setHeader('Content-Type', 'application/json');
-        res.end(JSON.stringify([{ id: 1, name: '张三' }]));
-    } else if (url === '/api/users' && method === 'POST') {
+        res.end(JSON.stringify([
+            { id: 1, name: '张三' },
+            { id: 2, name: '李四' }
+        ]));
+        
+    } else if (pathname === '/api/users' && method === 'POST') {
+        // 处理 POST 请求
         let body = '';
-
         req.on('data', chunk => {
             body += chunk.toString();
         });
-
         req.on('end', () => {
             const data = JSON.parse(body);
             res.statusCode = 201;
-            res.setHeader('Content-Type', 'application/json');
-            res.end(JSON.stringify({ id: Date.now(), ...data }));
+            res.end(JSON.stringify({ 
+                id: Date.now(), 
+                ...data 
+            }));
         });
+        
     } else {
         res.statusCode = 404;
-        res.setHeader('Content-Type', 'text/plain');
-        res.end('404 未找到');
+        res.end(JSON.stringify({ error: '未找到' }));
     }
 });
 
 server.listen(3000);
 ```
 
-### 处理请求数据
-
-```javascript
-// 处理 GET 查询参数
-const url = require('url');
-
-http.createServer((req, res) => {
-    const parsedUrl = url.parse(req.url, true);
-    const query = parsedUrl.query;
-
-    console.log(query);  // { name: '张三', age: '25' }
-
-    res.end(JSON.stringify(query));
-});
-
-// 处理 POST 请求体
-http.createServer((req, res) => {
-    if (req.method === 'POST') {
-        const chunks = [];
-
-        req.on('data', chunk => {
-            chunks.push(chunk);
-        });
-
-        req.on('end', () => {
-            const body = Buffer.concat(chunks).toString();
-            const data = JSON.parse(body);
-            res.end(JSON.stringify({ received: data }));
-        });
-    }
-});
-```
-
 ---
 
-## 2.2 Express 框架基础
+## 2.3 Express 框架
 
-### 快速开始
+### 2.3.1 什么是 Express？
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  Express = Node.js 的 Web 框架                              │
+│                                                             │
+│  就像：                                                     │
+│  - 汽车的框架：提供基础结构，组装零件                        │
+│  - 建筑的骨架：提供支撑，填充墙壁                            │
+│  - 乐高的底板：提供基础，搭建模型                            │
+│                                                             │
+│  优点：                                                     │
+│  - 简单易学                                                 │
+│  - 灵活扩展                                                 │
+│  - 中间件丰富                                               │
+│  - 社区活跃                                                 │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### 2.3.2 快速开始
+
+```bash
+# 安装 Express
+npm install express
+```
 
 ```javascript
-// 安装：npm install express
 const express = require('express');
 const app = express();
-const PORT = 3000;
 
-// 基础路由
+// 中间件（解析 JSON）
+app.use(express.json());
+
+// 路由
 app.get('/', (req, res) => {
     res.send('Hello Express!');
 });
 
-app.listen(PORT, () => {
-    console.log(`服务器运行在 http://localhost:${PORT}`);
+// 启动服务器
+app.listen(3000, () => {
+    console.log('服务器运行在 http://localhost:3000');
 });
 ```
 
-### 中间件
+### 2.3.3 路由详解
 
 ```javascript
-// 应用级中间件
-app.use((req, res, next) => {
-    console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
-    next();
-});
+const express = require('express');
+const app = express();
 
-// 解析 JSON
-app.use(express.json());
-
-// 解析 URL 编码
-app.use(express.urlencoded({ extended: true }));
-
-// 静态文件服务
-app.use(express.static('public'));
-
-// 第三方中间件
-const cors = require('cors');
-app.use(cors());
-```
-
----
-
-## 2.3 路由详解
-
-### 基础路由
-
-```javascript
 // GET 请求
 app.get('/users', (req, res) => {
-    res.send('获取用户列表');
+    res.json([
+        { id: 1, name: '张三' },
+        { id: 2, name: '李四' }
+    ]);
 });
 
 // POST 请求
 app.post('/users', (req, res) => {
-    res.send('创建用户');
+    // req.body 包含请求体数据
+    const newUser = req.body;
+    console.log('创建用户:', newUser);
+    
+    res.status(201).json({
+        id: Date.now(),
+        ...newUser
+    });
 });
 
-// PUT 请求
+// PUT 请求（完整更新）
 app.put('/users/:id', (req, res) => {
-    res.send(`更新用户 ${req.params.id}`);
+    const { id } = req.params;
+    const data = req.body;
+    
+    res.json({ id, ...data, updatedAt: new Date() });
+});
+
+// PATCH 请求（部分更新）
+app.patch('/users/:id', (req, res) => {
+    const { id } = req.params;
+    const updates = req.body;
+    
+    res.json({ id, ...updates });
 });
 
 // DELETE 请求
 app.delete('/users/:id', (req, res) => {
-    res.send(`删除用户 ${req.params.id}`);
+    const { id } = req.params;
+    res.json({ message: `用户 ${id} 已删除` });
 });
-
-// 链式路由
-app.route('/books')
-    .get((req, res) => {
-        res.send('获取图书列表');
-    })
-    .post((req, res) => {
-        res.send('创建图书');
-    });
 ```
 
-### 路由参数
+### 2.3.4 路由参数
 
 ```javascript
-// URL 参数
+// 路径参数
 app.get('/users/:id', (req, res) => {
-    res.send(`用户 ID: ${req.params.id}`);
+    const { id } = req.params;
+    res.json({ userId: id });
 });
 
 // 多个参数
 app.get('/users/:userId/posts/:postId', (req, res) => {
     const { userId, postId } = req.params;
-    res.send(`用户 ${userId} 的文章 ${postId}`);
+    res.json({ userId, postId });
 });
 
 // 可选参数
 app.get('/users/:id?', (req, res) => {
     if (req.params.id) {
-        res.send(`用户 ${req.params.id}`);
+        res.json({ userId: req.params.id });
     } else {
-        res.send('用户列表');
+        res.json({ users: [] });
     }
 });
 
 // 查询参数
 app.get('/search', (req, res) => {
     const { q, page = 1, limit = 10 } = req.query;
-    res.send({ query: q, page, limit });
-});
-```
-
-### 路由通配符
-
-```javascript
-// 星号通配符
-app.get('/admin/*', (req, res) => {
-    res.send('管理员页面');
-});
-
-// 正则表达式
-app.get(/^\/api\/v\d+\/users$/, (req, res) => {
-    res.send('API 用户端点');
+    res.json({ query: q, page: Number(page), limit: Number(limit) });
 });
 ```
 
@@ -233,14 +334,46 @@ app.get(/^\/api\/v\d+\/users$/, (req, res) => {
 
 ## 2.4 中间件详解
 
-### 自定义中间件
+### 2.4.1 什么是中间件？
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  中间件 = 请求处理的"流水线"                                 │
+│                                                             │
+│  就像：                                                     │
+│  - 安检流程：检查行李 → 检查身份 → 检查体温                  │
+│  - 工厂流水线：原料 → 加工 → 质检 → 包装                    │
+│  - 餐厅流程：迎宾 → 点餐 → 烹饪 → 上菜                      │
+│                                                             │
+│  中间件的作用：                                              │
+│  - 预处理请求                                               │
+│  - 记录日志                                                 │
+│  - 验证身份                                                 │
+│  - 错误处理                                                 │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### 2.4.2 中间件的执行流程
+
+```
+请求 → 中间件1 → 中间件2 → 中间件3 → 路由处理 → 响应
+              ↓
+         如果调用 next()
+         继续下一个中间件
+```
+
+### 2.4.3 自定义中间件
 
 ```javascript
+const express = require('express');
+const app = express();
+
 // 日志中间件
 function logger(req, res, next) {
     const timestamp = new Date().toISOString();
     console.log(`[${timestamp}] ${req.method} ${req.originalUrl}`);
-    next();
+    next();  // 继续传递给下一个中间件
 }
 
 app.use(logger);
@@ -248,21 +381,21 @@ app.use(logger);
 // 认证中间件
 function authMiddleware(req, res, next) {
     const token = req.headers.authorization?.split(' ')[1];
-
+    
     if (!token) {
         return res.status(401).json({ error: '缺少认证令牌' });
     }
-
+    
     try {
-        // const decoded = verifyToken(token);
-        req.user = { id: 1, name: '张三' };
+        // 验证 token（实际项目中需要解码）
+        req.user = { id: 1, name: '张三', role: 'admin' };
         next();
     } catch (error) {
         res.status(401).json({ error: '无效的令牌' });
     }
 }
 
-// 权限中间件
+// 权限中间件（高阶函数）
 function requireRole(role) {
     return (req, res, next) => {
         if (req.user.role !== role) {
@@ -272,15 +405,23 @@ function requireRole(role) {
     };
 }
 
+// 使用中间件
+app.get('/profile', authMiddleware, (req, res) => {
+    res.json(req.user);
+});
+
 app.get('/admin', authMiddleware, requireRole('admin'), (req, res) => {
-    res.send('管理员面板');
+    res.json({ message: '管理员面板' });
 });
 ```
 
-### 错误处理中间件
+### 2.4.4 错误处理中间件
 
 ```javascript
-// 404 处理
+const express = require('express');
+const app = express();
+
+// 404 处理（放在所有路由后面）
 app.use((req, res, next) => {
     res.status(404).json({
         error: '未找到',
@@ -288,541 +429,244 @@ app.use((req, res, next) => {
     });
 });
 
-// 全局错误处理
+// 全局错误处理（必须 4 个参数）
 app.use((err, req, res, next) => {
     console.error('错误:', err.stack);
-
+    
     const status = err.status || 500;
-
+    
     res.status(status).json({
         error: err.name || '服务器错误',
         message: err.message,
+        // 生产环境不显示堆栈
         ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
     });
 });
-
-// 自定义错误类
-class AppError extends Error {
-    constructor(message, status) {
-        super(message);
-        this.status = status;
-        this.name = 'AppError';
-    }
-}
-
-// 使用示例
-app.get('/error', (req, res, next) => {
-    next(new AppError(' Something went wrong', 400));
-});
-```
-
-### 第三方中间件
-
-```javascript
-const express = require('express');
-const cors = require('cors');
-const helmet = require('helmet');
-const morgan = require('morgan');
-const rateLimit = require('express-rate-limit');
-const compression = require('compression');
-
-const app = express();
-
-// 安全相关
-app.use(helmet());  // 安全头
-app.use(cors({      // 跨域
-    origin: 'https://example.com',
-    credentials: true
-}));
-
-// 日志
-app.use(morgan('combined'));
-
-// 限流
-const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000,  // 15 分钟
-    max: 100  // 最多 100 个请求
-});
-app.use('/api/', limiter);
-
-// 压缩
-app.use(compression());
 ```
 
 ---
 
-## 2.5 Express Router
+## 2.5 RESTful API 设计
 
-### 基础用法
+### 2.5.1 什么是 RESTful？
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  REST = 表现层状态转换                                       │
+│                                                             │
+│  RESTful = 遵循 REST 规范的 API 设计风格                     │
+│                                                             │
+│  核心原则：                                                  │
+│  1. 资源导向：URL 代表资源，不是动作                         │
+│  2. 统一接口：使用标准的 HTTP 方法                           │
+│  3. 无状态：每个请求都是独立的                                │
+│  4. 分层系统：客户端不需要知道服务器细节                     │
+│                                                             │
+│  就像：                                                     │
+│  - 图书馆：图书是资源，借书是操作                            │
+│  - 字典：单词是资源，查询是操作                              │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### 2.5.2 RESTful URL 设计
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    RESTful URL 规范                          │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  资源       │  GET(查)  │ POST(创) │ PUT(改) │ DELETE(删)  │
+│  ──────────┼───────────┼──────────┼─────────┼────────────  │
+│  /users    │ 获取用户列表│ 创建用户 │ 批量更新 │ 删除所有用户│
+│  /users/1  │ 获取用户1   │    -     │ 更新用户1│ 删除用户1  │
+│  /users/1/posts │ 获取用户的帖子 │ 为用户创建帖子 │ - │ -    │
+│                                                             │
+│  注意事项：                                                 │
+│  - 资源名用复数                                             │
+│  - 用 / 表示层级关系                                        │
+│  - 避免使用动词                                             │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### 2.5.3 RESTful API 示例
 
 ```javascript
-// routes/users.js
 const express = require('express');
-const router = express.Router();
-
-// GET /api/users
-router.get('/', (req, res) => {
-    res.json([{ id: 1, name: '张三' }]);
-});
-
-// POST /api/users
-router.post('/', (req, res) => {
-    res.status(201).json({ id: Date.now(), ...req.body });
-});
-
-// GET /api/users/:id
-router.get('/:id', (req, res) => {
-    res.json({ id: req.params.id, name: '张三' });
-});
-
-module.exports = router;
-
-// app.js
-const express = require('express');
-const userRoutes = require('./routes/users');
-
 const app = express();
-app.use('/api/users', userRoutes);
-```
+app.use(express.json());
 
-### 模块化的路由结构
-
-```javascript
-// routes/index.js
-const express = require('express');
-const router = express.Router();
-
-const userRoutes = require('./users');
-const postRoutes = require('./posts');
-const authRoutes = require('./auth');
-
-// 挂载路由
-router.use('/users', userRoutes);
-router.use('/posts', postRoutes);
-router.use('/auth', authRoutes);
-
-// 首页
-router.get('/', (req, res) => {
-    res.json({
-        message: 'API 首页',
-        endpoints: {
-            users: '/api/users',
-            posts: '/api/posts',
-            auth: '/api/auth'
-        }
-    });
-});
-
-module.exports = router;
-
-// app.js
-const express = require('express');
-const routes = require('./routes');
-
-const app = express();
-app.use('/api', routes);
-```
-
----
-
-## 2.6 RESTful API 设计
-
-### REST 原则
-
-```javascript
-// 资源命名规范
-GET    /api/users          # 获取用户列表
-POST   /api/users          # 创建用户
-GET    /api/users/:id      # 获取单个用户
-PUT    /api/users/:id      # 更新用户（全量）
-PATCH  /api/users/:id      # 更新用户（部分）
-DELETE /api/users/:id      # 删除用户
-
-// 嵌套资源
-GET    /api/users/:userId/posts     # 获取用户的所有文章
-POST   /api/users/:userId/posts     # 为用户创建文章
-GET    /api/posts/:id/comments      # 获取文章的评论
-
-// 查询参数
-GET /api/users?page=1&limit=10&sort=name&order=asc
-GET /api/posts?author=1&status=published&tag=javascript
-```
-
-### 完整的 RESTful 实现
-
-```javascript
-const express = require('express');
-const router = express.Router();
-
-// 模拟数据库
+// 模拟数据
 let users = [
     { id: 1, name: '张三', email: 'zhang@example.com' },
     { id: 2, name: '李四', email: 'li@example.com' }
 ];
 
-// GET /api/users - 获取所有用户
-router.get('/users', (req, res) => {
-    const { page = 1, limit = 10 } = req.query;
-    const startIndex = (page - 1) * limit;
-    const endIndex = startIndex + parseInt(limit);
-
-    const result = {
-        users: users.slice(startIndex, endIndex),
-        pagination: {
-            currentPage: parseInt(page),
-            totalPages: Math.ceil(users.length / limit),
-            total: users.length
-        }
-    };
-
-    res.json(result);
+// 获取所有用户
+app.get('/api/users', (req, res) => {
+    res.json(users);
 });
 
-// GET /api/users/:id - 获取单个用户
-router.get('/users/:id', (req, res) => {
-    const user = users.find(u => u.id === parseInt(req.params.id));
-
+// 获取单个用户
+app.get('/api/users/:id', (req, res) => {
+    const user = users.find(u => u.id === Number(req.params.id));
     if (!user) {
         return res.status(404).json({ error: '用户不存在' });
     }
-
     res.json(user);
 });
 
-// POST /api/users - 创建用户
-router.post('/users', (req, res) => {
-    const { name, email } = req.body;
-
-    // 验证
-    if (!name || !email) {
-        return res.status(400).json({ error: 'name 和 email 是必填项' });
-    }
-
+// 创建用户
+app.post('/api/users', (req, res) => {
     const newUser = {
         id: Date.now(),
-        name,
-        email
+        ...req.body
     };
-
     users.push(newUser);
     res.status(201).json(newUser);
 });
 
-// PUT /api/users/:id - 全量更新
-router.put('/users/:id', (req, res) => {
-    const user = users.find(u => u.id === parseInt(req.params.id));
-
-    if (!user) {
-        return res.status(404).json({ error: '用户不存在' });
-    }
-
-    const { name, email } = req.body;
-    user.name = name || user.name;
-    user.email = email || user.email;
-
-    res.json(user);
-});
-
-// PATCH /api/users/:id - 部分更新
-router.patch('/users/:id', (req, res) => {
-    const user = users.find(u => u.id === parseInt(req.params.id));
-
-    if (!user) {
-        return res.status(404).json({ error: '用户不存在' });
-    }
-
-    // 只更新提供的字段
-    Object.assign(user, req.body);
-
-    res.json(user);
-});
-
-// DELETE /api/users/:id - 删除用户
-router.delete('/users/:id', (req, res) => {
-    const index = users.findIndex(u => u.id === parseInt(req.params.id));
-
+// 更新用户
+app.put('/api/users/:id', (req, res) => {
+    const id = Number(req.params.id);
+    const index = users.findIndex(u => u.id === id);
+    
     if (index === -1) {
         return res.status(404).json({ error: '用户不存在' });
     }
+    
+    users[index] = { ...users[index], ...req.body };
+    res.json(users[index]);
+});
 
-    users.splice(index, 1);
+// 删除用户
+app.delete('/api/users/:id', (req, res) => {
+    const id = Number(req.params.id);
+    users = users.filter(u => u.id !== id);
     res.status(204).send();
 });
 
-module.exports = router;
-```
-
-### 状态码规范
-
-```javascript
-// 2xx 成功
-200 OK          // 请求成功
-201 Created     // 资源创建成功
-204 No Content  // 删除成功，无返回内容
-
-// 4xx 客户端错误
-400 Bad Request       // 请求参数错误
-401 Unauthorized      // 未授权
-403 Forbidden         // 禁止访问
-404 Not Found         // 资源不存在
-409 Conflict          // 资源冲突（如重复）
-422 Unprocessable     // 参数验证失败
-
-// 5xx 服务器错误
-500 Internal Server Error  // 服务器内部错误
-
-// 使用示例
-app.post('/api/users', async (req, res) => {
-    // 验证失败
-    if (!isValid) {
-        return res.status(400).json({ error: '参数错误' });
-    }
-
-    // 资源已存在
-    if (existing) {
-        return res.status(409).json({ error: '用户已存在' });
-    }
-
-    // 创建成功
-    res.status(201).json(user);
-});
+app.listen(3000);
 ```
 
 ---
 
-## 2.7 实践练习
+## 2.6 实践练习
 
-### 练习 1：博客 API
+### 练习 1：创建简单的 API
 
 ```javascript
-// app.js
 const express = require('express');
 const app = express();
-
 app.use(express.json());
 
-// 数据存储
-const posts = [
-    { id: 1, title: 'Hello World', content: '第一篇文章', author: '张三' }
+// 书籍数据
+let books = [
+    { id: 1, title: 'JavaScript 高级程序设计', author: '张三' },
+    { id: 2, title: 'Node.js 权威指南', author: '李四' }
 ];
 
-// 获取所有文章
-app.get('/api/posts', (req, res) => {
-    const { author, limit = 10 } = req.query;
-    let result = posts;
-
-    if (author) {
-        result = result.filter(p => p.author === author);
-    }
-
-    res.json(result.slice(0, limit));
+// GET /books - 获取所有书籍
+app.get('/books', (req, res) => {
+    res.json(books);
 });
 
-// 获取单篇文章
-app.get('/api/posts/:id', (req, res) => {
-    const post = posts.find(p => p.id === parseInt(req.params.id));
-
-    if (!post) {
-        return res.status(404).json({ error: '文章不存在' });
+// GET /books/:id - 获取单本书
+app.get('/books/:id', (req, res) => {
+    const book = books.find(b => b.id === Number(req.params.id));
+    if (!book) {
+        return res.status(404).json({ error: '书籍不存在' });
     }
-
-    res.json(post);
+    res.json(book);
 });
 
-// 创建文章
-app.post('/api/posts', (req, res) => {
-    const { title, content, author } = req.body;
-
-    if (!title || !content || !author) {
-        return res.status(400).json({ error: '缺少必填字段' });
-    }
-
-    const newPost = {
+// POST /books - 添加书籍
+app.post('/books', (req, res) => {
+    const newBook = {
         id: Date.now(),
-        title,
-        content,
-        author,
-        createdAt: new Date().toISOString()
+        ...req.body
     };
-
-    posts.push(newPost);
-    res.status(201).json(newPost);
+    books.push(newBook);
+    res.status(201).json(newBook);
 });
 
-// 更新文章
-app.put('/api/posts/:id', (req, res) => {
-    const post = posts.find(p => p.id === parseInt(req.params.id));
-
-    if (!post) {
-        return res.status(404).json({ error: '文章不存在' });
-    }
-
-    Object.assign(post, req.body);
-    res.json(post);
-});
-
-// 删除文章
-app.delete('/api/posts/:id', (req, res) => {
-    const index = posts.findIndex(p => p.id === parseInt(req.params.id));
-
-    if (index === -1) {
-        return res.status(404).json({ error: '文章不存在' });
-    }
-
-    posts.splice(index, 1);
+// DELETE /books/:id - 删除书籍
+app.delete('/books/:id', (req, res) => {
+    const id = Number(req.params.id);
+    books = books.filter(b => b.id !== id);
     res.status(204).send();
 });
 
 app.listen(3000, () => {
-    console.log('博客 API 运行在 http://localhost:3000');
+    console.log('图书 API 运行在 http://localhost:3000');
 });
 ```
 
-### 练习 2：中间件系统
+---
+
+## 2.7 常见问答
+
+### Q1: Express 和原生 HTTP 模块怎么选择？
 
 ```javascript
-// middleware/logger.js
-function logger(req, res, next) {
-    const start = Date.now();
+// 原生 HTTP：简单、灵活
+// 适合：学习原理、微型项目
 
-    res.on('finish', () => {
-        const duration = Date.now() - start;
-        console.log(`${req.method} ${req.originalUrl} - ${res.statusCode} (${duration}ms)`);
-    });
+const http = require('http');
+http.createServer((req, res) => {
+    res.end('Hello');
+});
 
-    next();
-}
+// Express：功能强大、生态丰富
+// 适合：生产项目、需要路由和中间件
 
-module.exports = logger;
-
-// middleware/validate.js
-function validate(schema) {
-    return (req, res, next) => {
-        const { error } = schema.validate(req.body);
-
-        if (error) {
-            return res.status(400).json({
-                error: '验证失败',
-                details: error.details.map(d => d.message)
-            });
-        }
-
-        next();
-    };
-}
-
-module.exports = validate;
-
-// middleware/cache.js
-const cache = new Map();
-
-function cacheMiddleware(duration) {
-    return (req, res, next) => {
-        const key = req.originalUrl;
-        const cached = cache.get(key);
-
-        if (cached && Date.now() - cached.timestamp < duration) {
-            return res.json(cached.data);
-        }
-
-        // 拦截响应
-        const json = res.json.bind(res);
-        res.json = (data) => {
-            cache.set(key, { data, timestamp: Date.now() });
-            return json(data);
-        };
-
-        next();
-    };
-}
-
-module.exports = cacheMiddleware;
-
-// 使用
 const express = require('express');
-const logger = require('./middleware/logger');
-const validate = require('./middleware/validate');
-const cache = require('./middleware/cache');
-
 const app = express();
-app.use(logger);
+app.get('/', (req, res) => res.send('Hello'));
+```
 
-app.get('/api/data', cache(60000), (req, res) => {
-    res.json({ data: 'cached for 1 minute' });
+### Q2: 中间件的执行顺序？
+
+```javascript
+// 顺序很重要！
+app.use(middleware1);  // 先执行
+app.use(middleware2);  // 后执行
+app.get('/path', handler);  // 最后执行
+
+// 场景：先验证身份，再记录日志
+app.use(authMiddleware);  // 先验证
+app.use(loggerMiddleware); // 后记录
+```
+
+### Q3: 如何处理跨域请求？
+
+```javascript
+// 安装 cors 中间件
+// npm install cors
+
+const cors = require('cors');
+app.use(cors());
+
+// 或者手动设置
+app.use((req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    next();
 });
 ```
 
 ---
 
-## 2.8 常见问答
+## 2.8 学习资源
 
-### Q1: Express 和 Koa 如何选择？
+### 官方文档
 
-**答：**
-- **Express**: 成熟稳定，生态丰富，适合大多数项目
-- **Koa**: 更现代化，基于 async/await，更轻量
-
-```javascript
-// Express
-app.get('/', (req, res) => {
-    res.send('Hello');
-});
-
-// Koa
-app.use(async (ctx, next) => {
-    ctx.body = 'Hello';
-});
-```
-
-### Q2: 如何处理大文件上传？
-
-```javascript
-const multer = require('multer');
-
-// 流式处理大文件
-const upload = multer({
-    storage: multer.createWriteStream({
-        bucket: 'uploads',
-        key: (file) => `${Date.now()}-${file.originalname}`
-    }),
-    limits: {
-        fileSize: 100 * 1024 * 1024  // 100MB
-    }
-});
-
-app.post('/upload', upload.single('file'), (req, res) => {
-    res.json({ filename: req.file.filename });
-});
-```
-
-### Q3: 如何实现 API 版本控制？
-
-```javascript
-// URL 路径版本
-app.use('/api/v1/users', userRoutesV1);
-app.use('/api/v2/users', userRoutesV2);
-
-// 请求头版本
-app.use('/api/users', (req, res, next) => {
-    const version = req.headers['api-version'] || 'v1';
-
-    if (version === 'v2') {
-        return userRoutesV2(req, res, next);
-    }
-
-    userRoutesV1(req, res, next);
-});
-```
+- [Express 官网](https://expressjs.com/)
+- [Express 中文文档](https://expressjs.com/zh-cn/)
 
 ---
 
-## 2.9 学习资源
-
-- [Express 官方文档](https://expressjs.com/)
-- [RESTful API 设计最佳实践](https://github.com/vasanthk/restful-api-best-practices)
-- [Node.js API 设计指南](https://github.com/elsewhencode/ultimate-backend)
-
----
-
-**上一章：** [← 01-Node.js 基础](./01-Node.js 基础.md)
+**上一章：** [← 01-Node.js 基础](./01-Node.js%20基础.md)  
 **下一章：** [→ 03-数据库集成](./03-数据库集成.md)
