@@ -21,25 +21,25 @@ hello-frontend/
 ├── .gitignore                    # Git 忽略规则
 ├── 01-html5/                     # HTML5 模块 (3 章)
 ├── 02-css3/                      # CSS3 模块 (4 章)
-├── 03-javascript/                # JavaScript 模块 (4 章)
+├── 03-javascript/                # JavaScript 模块 (12 章)
 ├── 04-es6+/                      # ES6+ 模块 (14 章)
-├── 05-typescript/                # TypeScript 模块 (10 章 + 补充文档)
-├── 06-nodejs/                    # Node.js 模块 (6 章)
+├── 05-typescript/                # TypeScript 模块 (35+ 文档)
+├── 06-nodejs/                    # Node.js 模块 (6 章 + 11 内置模块详解)
 ├── 07-engineering/               # 工程化模块 (1 章)
 └── 08-frameworks/                # 框架模块 (1 章)
 ```
 
 ### 模块详情
 
-| 模块 | 章节数 | 内容 |
+| 模块 | 文件数 | 内容 |
 |------|--------|------|
 | 01-html5 | 3 | 基础语法、表单详解、语义化标签 |
 | 02-css3 | 4 | 基础语法、布局相关、动画与过渡、响应式设计 |
-| 03-javascript | 4 | 核心语法、DOM 操作、异步编程、高级特性 |
-| 04-es6+ | 14 | let/const、箭头函数、解构、Class、模块化、Promise、生成器、Proxy 等 |
-| 05-typescript | 10+ | 基础类型、接口、类型别名、泛型、类型守卫、高级类型编程、工具类型、装饰器、实战 |
-| 06-nodejs | 6 | Node.js 基础、HTTP 与 Web、数据库、认证安全、实用技术、项目实战 |
-| 07-engineering | 1 | npm/yarn/pnpm、Webpack、Vite、ESLint、Prettier、Vitest |
+| 03-javascript | 12 | 变量、数据类型、运算符、控制流、函数、作用域、对象、数组、DOM、异步、错误处理、高级特性 |
+| 04-es6+ | 14 | let/const、箭头函数、解构、模板字符串、Map/Set、Class、Promise、生成器、Proxy、模块化、ES2017-2024 特性等 |
+| 05-typescript | 35+ | 零基础入门、环境配置、基础类型、接口、泛型、类型守卫、高级类型编程、工具类型、装饰器、实战、React/Vue/Node.js 集成 |
+| 06-nodejs | 17 | Node.js 基础、HTTP 与 Web、数据库、认证安全、实用技术、项目实战、内置模块详解 (http/https、fs、path、events、stream、buffer、crypto、util、os、timers) |
+| 07-engineering | 1 | npm/yarn/pnpm、Webpack、Vite、ESLint、Prettier、Vitest、Husky |
 | 08-frameworks | 1 | React 基础、Vue 基础、Router、状态管理（Redux/Pinia） |
 
 ## 文档结构模式
@@ -74,6 +74,18 @@ hello-frontend/
 07-engineering/ → 08-frameworks/
 ```
 
+### TypeScript 专项学习路径
+
+**零基础推荐路径：**
+```
+00-TypeScript 零基础快速入门 → 新学习大纲-零基础到进阶 → 01-环境配置 → 02-基础类型 → 03-接口 → type-interface-class 详解
+```
+
+**系统学习路径：**
+```
+入门篇 (第1-3章) → 进阶篇 (第4-6章) → 高级篇 (第7-9章) → 实战篇 (第10章)
+```
+
 ## 开发环境
 
 ### 必备工具
@@ -105,6 +117,15 @@ hello-frontend/
 - 保持提交粒度适中
 - 遵循项目已有的提交风格
 
+### 最近提交记录
+```
+9ca5b64 docs: 补充 Promise 代码详细注释
+1fc00db feat: 新增 Node.js 内置模块详解文档
+5d7f075 refactor: 重构 Node.js 模块，增加详细理论讲解和生活化比喻
+19fff0e refactor: 重构 JavaScript/TypeScript 模块，增加详细理论讲解和生活化比喻
+bae772e chore: 清理待提交文件
+```
+
 ## 协作指南
 
 ### 文件命名规范
@@ -123,7 +144,7 @@ hello-frontend/
 
 ## 项目状态
 
-- **总章节数**: 35+ 章
+- **总文档数**: 98 个 Markdown 文件
 - **完成状态**: 全部完成 ✅
 - **最后更新**: 2026-03-01
 
@@ -140,3 +161,31 @@ hello-frontend/
 - [freeCodeCamp](https://www.freecodecamp.org/)
 - [CodePen](https://codepen.io/)
 - [StackBlitz](https://stackblitz.com/)
+
+### TypeScript 专项资源
+- [Type Challenges](https://github.com/type-challenges/type-challenges) - 类型编程挑战
+- [TypeScript Playground](https://www.typescriptlang.org/play/) - 在线练习
+- [TypeScript Deep Dive](https://basarat.gitbook.io/typescript/) - 深入学习
+
+## 特殊说明
+
+### TypeScript 模块结构
+TypeScript 模块采用多编号体系：
+- `00-` 系列：零基础快速入门
+- `01-10` 系列：系统学习主教程
+- `11-14` 系列：基础补充文档
+- `21-25` 系列：基础进阶文档
+- `31-34` 系列：中级进阶文档
+- `41-44` 系列：高级进阶文档
+- `51-54` 系列：实战应用文档
+
+### Node.js 内置模块详解
+位于 `06-nodejs/99-内置模块详解/` 子目录，涵盖：
+- http/https、fs、path、events、stream
+- buffer、crypto、util、os、timers
+
+### 文档特色
+- 使用生活化比喻解释技术概念
+- 代码示例包含详细中文注释
+- 每章配有实践练习和常见问题解答
+- TypeScript 模块提供速查手册和实战练习册
