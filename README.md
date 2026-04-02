@@ -6,16 +6,17 @@
 
 ## 📚 课程目录
 
-| 序号 | 模块 | 内容 | 文件数 | 进度 |
-|------|------|------|--------|------|
-| 01 | [HTML5](./01-html5/) | 基础语法、表单、语义化标签 | 7 | ✅ |
-| 02 | [CSS3](./02-css3/) | 选择器、布局、动画、响应式 | 9 | ✅ |
-| 03 | [JavaScript](./03-javascript/) | 核心语法、DOM、异步、高级特性 | 18 | ✅ |
-| 04 | [ES6+](./04-es6+/) | 现代 JavaScript 特性 | 20 | ✅ |
-| 05 | [TypeScript](./05-typescript/) | 类型系统、接口、泛型 | 37 | ✅ |
-| 06 | [Node.js](./06-nodejs/) | 服务端开发、Express、数据库 | 24 | ✅ |
-| 07 | [工程化](./07-engineering/) | Webpack、Vite、ESLint、测试 | 2 | 🚧 |
-| 08 | [框架](./08-frameworks/) | React、Vue、路由、状态管理 | 2 | 🚧 |
+| 序号 | 模块 | 内容 | 进度 |
+|------|------|------|------|
+| 01 | [HTML5](./01-html5/) | 基础语法、表单、语义化标签 | ✅ |
+| 02 | [CSS3](./02-css3/) | 选择器、布局、动画、响应式 | ✅ |
+| 03 | [JavaScript](./03-javascript/) | 核心语法、DOM、异步、高级特性 | ✅ |
+| 04 | [ES6+](./04-es6+/) | 现代 JavaScript 特性 | ✅ |
+| 05 | [TypeScript](./05-typescript/) | 类型系统、接口、泛型 | ✅ |
+| 06 | [Node.js](./06-nodejs/) | 服务端开发、Express、数据库 | ✅ |
+| 07 | [工程化](./07-engineering/) | Webpack、Vite、ESLint、测试 | ✅ |
+| 08 | [React](./09-react/) | React 组件、Hooks、路由、状态管理 | ✅ |
+| 09 | [Vue](./10-vue/) | Vue 组件、Composition API、路由、状态管理 | ✅ |
 
 ---
 
@@ -39,11 +40,17 @@
 ```
 **目标：** 掌握服务端开发，理解全栈开发流程
 
-### 第四阶段：工程化与框架（3-4 周）
+### 第四阶段：工程化（2-3 周）
 ```
-07-engineering/ → 08-frameworks/
+07-engineering/
 ```
-**目标：** 学习工程化实践，掌握主流框架
+**目标：** 学习工程化实践，掌握构建工具
+
+### 第五阶段：框架学习（4-6 周）
+```
+09-react/ 或 10-vue/
+```
+**目标：** 掌握主流前端框架，能够独立开发应用
 
 ---
 
@@ -97,11 +104,28 @@ hello-frontend/
 │   ├── 02-构建工具/             # Webpack、Vite
 │   ├── 03-代码质量/             # ESLint、Prettier
 │   └── 04-测试工具/             # Jest、Vitest
-└── 08-frameworks/               # 框架模块
-    ├── 01-React 基础/           # React 核心
-    ├── 02-Vue 基础/             # Vue 核心
-    ├── 03-路由管理/             # Router
-    └── 04-状态管理/             # Redux、Pinia
+├── 09-react/                    # React 模块
+│   ├── 01-快速入门/             # React 简介、环境搭建
+│   ├── 02-核心概念/             # JSX、组件、Props、State
+│   ├── 03-Hooks 详解/           # useState、useEffect
+│   ├── 04-组件模式/             # 组合、复用
+│   ├── 05-路由管理/             # React Router
+│   ├── 06-状态管理/             # Redux Toolkit、Zustand
+│   ├── 07-样式方案/             # CSS Modules、Styled Components
+│   ├── 08-性能优化/             # memo、useMemo
+│   ├── 09-测试/                 # Jest、Testing Library
+│   └── 10-实战项目/             # 完整项目
+└── 10-vue/                      # Vue 模块
+    ├── 01-快速入门/             # Vue 简介、环境搭建
+    ├── 02-核心概念/             # 响应式、computed、watch
+    ├── 03-组件基础/             # Props、Events、Slots
+    ├── 04-Composition API/      # ref、reactive
+    ├── 05-路由管理/             # Vue Router
+    ├── 06-状态管理/             # Pinia
+    ├── 07-样式方案/             # Scoped CSS
+    ├── 08-性能优化/             # 懒加载、虚拟滚动
+    ├── 09-测试/                 # Vitest
+    └── 10-实战项目/             # 完整项目
 ```
 
 ---
