@@ -53,5 +53,3 @@
 
 ---
 
-**上一篇：** [← TypeScript 模块](../05-typescript/)
-**下一篇：** [→ 工程化模块](../07-engineering/)

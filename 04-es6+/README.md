@@ -65,5 +65,3 @@
 
 ---
 
-**上一篇：** [← JavaScript 模块](../03-javascript/)
-**下一篇：** [→ TypeScript 模块](../05-typescript/)

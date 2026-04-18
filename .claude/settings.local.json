@@ -17,7 +17,11 @@
       "Bash(git -C /Users/baxiang/Documents/hello-frontend status)",
       "Bash(ls:*)",
       "Bash(done)",
-      "mcp__websearch__web_search"
+      "mcp__websearch__web_search",
+      "Bash(xargs:*)",
+      "Bash(xargs sed:*)",
+      "Bash(while:*)",
+      "Bash(do sed -i '' '/\\\\*\\\\*上一篇：\\\\*\\\\*/d' \"$file\" sed -i '' '/\\\\*\\\\*下一篇：\\\\*\\\\*/d' \"$file\" done echo \"Completed removing navigation links from all files\")"
     ]
   }
 }

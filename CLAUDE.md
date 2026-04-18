@@ -38,7 +38,6 @@ Each chapter follows this template:
 - 实践练习 (Practice exercises with full code)
 - 常见问题 (FAQ)
 - 学习资源 (Resources)
-- Navigation links (上一篇/下一篇) at the bottom
 
 ## Development Notes
 
