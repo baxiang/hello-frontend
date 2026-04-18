@@ -1,245 +1,171 @@
-# Proxy 与 Reflect
+# Proxy 与 Reflect ⭐⭐
 
-> 掌握 JavaScript 元编程的核心工具
+> JavaScript 元编程：拦截和定制对象行为
+
+---
 
 ## 学习目标
 
-- ✅ 理解 Proxy 的基本概念和工作原理
-- ✅ 掌握常用拦截器的用法
-- ✅ 理解 Reflect API 的作用
-- ✅ 掌握 Proxy 与 Reflect 的配合使用
-- ✅ 能够使用 Proxy 实现数据验证、响应式等应用
+- 理解 Proxy 的工作原理和常用拦截器
+- 掌握 Reflect API 与 Proxy 的配合使用
+- 学会用 Proxy 实现数据验证、响应式系统等
 
 ---
 
-## 11.0 为什么要学 Proxy？
+## 生活化比喻
 
-### 11.0.1 故事背景
-
-在 ES6 之前，无法拦截对象的操作：
-
-```javascript
-const obj = { name: '张三' };
-
-// 无法拦截这些操作
-obj.name;           // 读取
-obj.name = '李四';   // 设置
-delete obj.name;    // 删除
-'name' in obj;      // 检查
-```
-
-ES6 引入了 Proxy，可以拦截这些操作。
-
-### 11.0.2 本章学习路径
+**Proxy 就像"智能门卫"**：
 
 ```
-第一步：Proxy 基础（什么是 Proxy）
-    ↓
-第二步：handler 拦截器（各种拦截方法）
-    ↓
-第三步：Reflect（配合 Proxy 使用）
-    ↓
-第四步：实际应用（验证、响应式等）
+比喻对应：
+
+┌──────────────────────────────────────────────────────┐
+│                  智能门卫                             │
+├──────────────────────────────────────────────────────┤
+│                                                      │
+│    原始对象 = 大楼里的住户                            │
+│    ─────────────                                     │
+│    住户自己住在那，不知道外面发生了什么               │
+│                                                      │
+│    Proxy = 门卫                                      │
+│    ─────────────                                     │
+│    所有进出都要经过门卫                               │
+│    门卫可以：                                        │
+│    - 记录谁来了（日志）                              │
+│    - 检查身份证（验证）                              │
+│    - 拒绝某些人进入（拦截）                          │
+│    - 转发请求给住户（Reflect）                      │
+│                                                      │
+│    handler = 门卫的工作手册                          │
+│    ─────────────                                     │
+│    get → 有人要拿东西时的处理规则                    │
+│    set → 有人要放东西时的处理规则                    │
+│    has → 有人问"有没有这个东西"时的处理规则          │
+│                                                      │
+│    Reflect = 标准转接流程                            │
+│    ─────────────                                     │
+│    门卫不想处理时，按标准流程转给住户                │
+│    Reflect.get(target, prop) = 直接拿住户的东西      │
+│                                                      │
+└──────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 11.1 Proxy 基础详解
+## L1 理解层：会用
 
-### 11.1.1 什么是 Proxy？
+### Proxy 基础
+
+**语法结构图：**
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│  Proxy = 代理 = 拦截对象操作的"中间人"                      │
-│                                                             │
-│  组成部分：                                                  │
-│  - target：原始对象                                         │
-│  - handler：拦截规则                                        │
-│  - proxy：代理后的对象                                       │
-│                                                             │
-│  就像：                                                     │
-│  - 房东（target）                                          │
-│  - 中介规则（handler）                                      │
-│  - 租房找中介（proxy）                                      │
-└─────────────────────────────────────────────────────────────┘
-```
-
-### 11.1.2 基本语法
-
-```javascript
-const target = { name: '张三' };
-
-const handler = {
-    // 读取属性时触发
-    get(target, prop) {
-        return target[prop];
-    },
-    
-    // 设置属性时触发
-    set(target, prop, value) {
-        target[prop] = value;
-        return true;
-    }
-};
+Proxy 结构：
 
 const proxy = new Proxy(target, handler);
+                            │        │
+                            │        └─ 拦截规则对象
+                            └─ 原始对象
 
-console.log(proxy.name);   // '张三'（触发 get）
-proxy.name = '李四';       // 触发 set
-console.log(proxy.name);   // '李四'
+常用拦截器：
+handler.get(target, prop, receiver)     → 读取属性
+handler.set(target, prop, value, receiver) → 设置属性
+handler.has(target, prop)               → in 操作符
+handler.deleteProperty(target, prop)    → delete 操作
+handler.apply(target, thisArg, args)    → 函数调用
+handler.construct(target, args, newTarget) → new 调用
 ```
 
----
-
-## 11.2 拦截器详解
-
-### 11.2.1 get - 读取属性
+**最简示例（1-3行）：**
 
 ```javascript
-const user = {
-    name: '张三',
-    age: 25
-};
-
-const proxy = new Proxy(user, {
-    get(target, prop) {
-        console.log(`读取 ${prop}`);
-        return target[prop];
-    }
+const proxy = new Proxy({ name: '张三' }, {
+    get: (target, prop) => `访问了 ${prop}`
 });
-
-console.log(proxy.name);  // 读取 name -> '张三'
-console.log(proxy.age);   // 读取 age -> 25
+proxy.name;  // '访问了 name'
 ```
 
-### 11.2.2 set - 设置属性
-
-```javascript
-const user = {};
-
-const proxy = new Proxy(user, {
-    set(target, prop, value) {
-        console.log(`设置 ${prop} = ${value}`);
-        target[prop] = value;
-        return true;
-    }
-});
-
-proxy.name = '张三';  // 设置 name = 张三
-proxy.age = 25;      // 设置 age = 25
-```
-
-### 11.2.3 has - in 操作符
-
-```javascript
-const user = { name: '张三' };
-
-const proxy = new Proxy(user, {
-    has(target, prop) {
-        console.log(`检查 ${prop}`);
-        return prop in target;
-    }
-});
-
-console.log('name' in proxy);  // 检查 name -> true
-console.log('age' in proxy);   // 检查 age -> false
-```
-
-### 11.2.4 deleteProperty - delete 操作
-
-```javascript
-const user = { name: '张三' };
-
-const proxy = new Proxy(user, {
-    deleteProperty(target, prop) {
-        console.log(`删除 ${prop}`);
-        delete target[prop];
-        return true;
-    }
-});
-
-delete proxy.name;  // 删除 name
-```
-
----
-
-## 11.3 Reflect 详解
-
-### 11.3.1 什么是 Reflect？
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│  Reflect = 反射 = 操作对象的"工具函数"                     │
-│                                                             │
-│  作用：                                                     │
-│  - 提供拦截对象操作的默认实现                               │
-│  - 作为 Proxy 拦截器的"后备"                                │
-│  - 让代码更简洁                                             │
-│                                                             │
-│  常用方法：                                                  │
-│  - Reflect.get()                                            │
-│  - Reflect.set()                                            │
-│  - Reflect.has()                                             │
-│  - Reflect.deleteProperty()                                  │
-└─────────────────────────────────────────────────────────────┘
-```
-
-### 11.3.2 使用 Reflect
-
-```javascript
-const user = { name: '张三' };
-
-// 不使用 Reflect
-const proxy1 = new Proxy(user, {
-    get(target, prop) {
-        return target[prop];  // 手动访问
-    }
-});
-
-// 使用 Reflect
-const proxy2 = new Proxy(user, {
-    get(target, prop) {
-        return Reflect.get(target, prop);  // 更简洁
-    }
-});
-```
-
-### 11.3.3 Proxy + Reflect 组合
+**详细示例：**
 
 ```javascript
 const user = { name: '张三', age: 25 };
 
 const proxy = new Proxy(user, {
     get(target, prop) {
-        // 记录访问日志
-        console.log(`访问 ${prop}`);
-        // 使用 Reflect 返回默认值
-        return Reflect.get(target, prop, { name: '默认' });
+        console.log(`读取: ${prop}`);
+        return target[prop];
     },
-    
     set(target, prop, value) {
-        // 验证
-        if (prop === 'age' && value < 0) {
-            throw new Error('年龄不能为负');
-        }
-        return Reflect.set(target, prop, value);
+        console.log(`设置: ${prop} = ${value}`);
+        target[prop] = value;
+        return true;
     }
 });
+
+proxy.name;          // 读取: name → '张三'
+proxy.age = 30;      // 设置: age = 30
 ```
 
 ---
 
-## 11.4 实际应用场景
+### Reflect
 
-### 11.4.1 数据验证
+**最简示例：**
+
+```javascript
+const obj = { name: '张三' };
+Reflect.get(obj, 'name');     // '张三'
+Reflect.set(obj, 'age', 25);  // true
+```
+
+**详细示例 — Proxy + Reflect 组合：**
+
+```javascript
+const user = { name: '张三', age: 25 };
+
+const proxy = new Proxy(user, {
+    get(target, prop) {
+        console.log(`读取 ${prop}`);
+        return Reflect.get(target, prop);  // 默认行为
+    },
+    set(target, prop, value) {
+        if (prop === 'age' && (value < 0 || value > 150)) {
+            throw new Error('年龄必须在 0-150 之间');
+        }
+        return Reflect.set(target, prop, value);
+    }
+});
+
+proxy.name;        // 读取 name → '张三'
+proxy.age = 30;    // ✅
+// proxy.age = -1; // ❌ Error
+```
+
+---
+
+## L2 实践层：用好
+
+### 常用拦截器速查
+
+| 拦截器 | 触发时机 | 对应操作 |
+|--------|---------|---------|
+| `get` | 读取属性 | `obj.prop` |
+| `set` | 设置属性 | `obj.prop = value` |
+| `has` | 检查属性 | `'prop' in obj` |
+| `deleteProperty` | 删除属性 | `delete obj.prop` |
+| `ownKeys` | 获取属性列表 | `Object.keys(obj)` |
+| `apply` | 函数调用 | `fn()` |
+| `construct` | new 调用 | `new Fn()` |
+
+### 实际应用
+
+**数据验证：**
 
 ```javascript
 function createValidator(schema) {
     return new Proxy({}, {
         set(target, prop, value) {
-            const validator = schema[prop];
-            if (validator && !validator(value)) {
-                throw new Error(`属性 ${prop} 验证失败`);
+            if (schema[prop] && !schema[prop](value)) {
+                throw new Error(`${prop} 验证失败`);
             }
             target[prop] = value;
             return true;
@@ -247,85 +173,227 @@ function createValidator(schema) {
     });
 }
 
-const validator = createValidator({
+const user = createValidator({
     age: v => v >= 0 && v <= 150,
     email: v => v.includes('@')
 });
-
-validator.age = 25;    // OK
-validator.email = 'test@example.com';  // OK
-// validator.age = -1;  // 抛出错误
+user.age = 25;       // ✅
+// user.age = -1;    // ❌ Error
 ```
 
-### 11.4.2 响应式系统
+**响应式系统（Vue 3 简化版）：**
 
 ```javascript
-function createReactive(obj, onChange) {
-    const handler = {
+function reactive(obj, onChange) {
+    return new Proxy(obj, {
         get(target, prop) {
-            return target[prop];
+            const value = target[prop];
+            return typeof value === 'object' && value !== null
+                ? reactive(value, onChange)
+                : value;
         },
         set(target, prop, value) {
+            const old = target[prop];
             target[prop] = value;
-            onChange(prop, value);
+            if (old !== value) onChange(prop, value, old);
             return true;
         }
-    };
-    
-    return new Proxy(obj, handler);
+    });
 }
 
-const state = createReactive({ count: 0 }, (prop, value) => {
-    console.log(`${prop} 变为 ${value}`);
+const state = reactive({ count: 0 }, (prop, val) => {
+    console.log(`${prop} 从 ${state[prop]} 变为 ${val}`);
 });
-
-state.count = 1;  // count 变为 1
-state.count = 2;  // count 变为 2
+state.count = 1;  // count 从 0 变为 1
 ```
 
----
-
-## 11.5 常见问答
-
-### Q1: Proxy 和 Object.defineProperty 有什么区别？
+### 反模式：不要这样做
 
 ```javascript
-// Object.defineProperty：只能监听单个属性
-const obj = {};
-Object.defineProperty(obj, 'name', {
-    get() { return '张三'; }
-});
-
-// Proxy：可以监听整个对象的所有操作
+// ❌ 错误：set 拦截器不返回 true
 const proxy = new Proxy({}, {
-    get() { return '张三'; }
+    set(target, prop, value) {
+        target[prop] = value;
+        // 忘记 return true → 严格模式下报错
+    }
+});
+
+// ✅ 正确：总是返回 true
+const proxy = new Proxy({}, {
+    set(target, prop, value) {
+        target[prop] = value;
+        return true;
+    }
 });
 ```
 
-### Q2: Proxy 有什么实际用途？
+### 适用场景
+
+| 场景 | 推荐方案 | 原因 |
+|------|---------|------|
+| 数据验证 | Proxy set 拦截 | 写入时自动验证 |
+| 响应式系统 | Proxy get/set | Vue 3 的核心机制 |
+| 属性访问日志 | Proxy get | 调试和监控 |
+| 默认值 | Proxy get | 访问不存在属性时返回默认值 |
+| API 客户端 | Proxy get | 动态方法调用 |
+
+---
+
+## L3 专家层：深入
+
+### Proxy vs Object.defineProperty
+
+| 特性 | Proxy | Object.defineProperty |
+|------|-------|----------------------|
+| 监听范围 | 整个对象 | 单个属性 |
+| 新增属性 | 自动监听 | 需要重新 define |
+| 删除属性 | 可以拦截 | 无法拦截 |
+| 数组索引 | 可以监听 | 需要单独处理 |
+| 性能 | 稍慢 | 更快 |
+| 兼容 | ES6+ | ES5+ |
+
+### Reflect 方法列表
 
 ```javascript
-// 1. 数据验证
-// 2. 响应式系统（Vue 3 使用 Proxy）
-// 3. API 代理
-// 4. 私有属性
-// 5. 日志记录
+Reflect.get(target, prop, receiver)
+Reflect.set(target, prop, value, receiver)
+Reflect.has(target, prop)
+Reflect.deleteProperty(target, prop)
+Reflect.apply(target, thisArg, args)
+Reflect.construct(target, args, newTarget)
+Reflect.getOwnPropertyDescriptor(target, prop)
+Reflect.defineProperty(target, prop, desc)
+Reflect.getPrototypeOf(target)
+Reflect.setPrototypeOf(target, proto)
+Reflect.isExtensible(target)
+Reflect.preventExtensions(target)
+Reflect.ownKeys(target)
+```
+
+### 知识关联
+
+```
+元编程关联：
+
+┌─────────────┐     ┌─────────────┐     ┌─────────────┐
+│  Proxy      │────→│  handler    │────→│  Reflect    │
+│  代理对象   │     │  拦截规则   │     │  默认行为   │
+└─────────────┘     └─────────────┘     └─────────────┘
+                           │
+              ┌────────────┼────────────┐
+              ↓            ↓            ↓
+        ┌──────────┐ ┌──────────┐ ┌──────────┐
+        │ 数据验证 │ │ 响应式   │ │ 日志/    │
+        │ 类型检查 │ │ 自动更新 │ │ 监控     │
+        └──────────┘ └──────────┘ └──────────┘
 ```
 
 ---
 
-## 11.6 学习资源
+## 术语定义
 
-### 官方文档
-
-- [MDN - Proxy](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Proxy)
-- [MDN - Reflect](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Reflect)
-
-### 推荐教程
-
-- [JavaScript.info - Proxy](https://zh.javascript.info/proxy)
+| 术语 | 定义 | 示例 |
+|------|------|------|
+| **Proxy** | 代理对象，拦截对目标对象的操作 | `new Proxy(target, handler)` |
+| **handler** | 拦截器对象，定义各种操作的拦截逻辑 | `{ get() {}, set() {} }` |
+| **Reflect** | 提供对象操作的默认实现 | `Reflect.get(obj, 'key')` |
+| **拦截器（Trap）** | handler 中拦截特定操作的方法 | `get`, `set`, `has` 等 |
+| **元编程** | 编写操作程序本身的程序 | Proxy 是元编程工具 |
 
 ---
 
-**上一章：** [← 10-生成器与迭代器](./10-生成器与迭代器.md)  
-**下一章：** [→ 12-模块化系统](./12-模块化系统.md)
+## 实践练习
+
+### 练习：只读代理 + 负索引数组
+
+```javascript
+// 练习 1：只读代理
+function readonly(obj) {
+    return new Proxy(obj, {
+        set() { throw new Error('对象是只读的'); },
+        deleteProperty() { throw new Error('对象是只读的'); }
+    });
+}
+
+const config = readonly({ theme: 'dark', lang: 'zh' });
+// config.theme = 'light';  // ❌ Error
+
+// 练习 2：负索引数组
+function createArray(...items) {
+    return new Proxy(items, {
+        get(target, prop) {
+            const index = Number(prop);
+            if (index < 0) return target[target.length + index];
+            return target[prop];
+        }
+    });
+}
+
+const arr = createArray('a', 'b', 'c');
+arr[-1];  // 'c'
+arr[-2];  // 'b'
+
+// 练习 3：API 客户端
+function createAPI(baseURL) {
+    return new Proxy({}, {
+        get(_, method) {
+            return async (path, options = {}) => {
+                const res = await fetch(`${baseURL}/${method}${path}`, options);
+                return res.json();
+            };
+        }
+    });
+}
+
+const api = createAPI('/api');
+// await api.get('/users');      → GET /api/get/users
+// await api.post('/users', {});  → POST /api/post/users
+```
+
+---
+
+## 常见问题
+
+### Q1：Proxy 和 Object.defineProperty 有什么区别？
+
+**Proxy 拦截整个对象，Object.defineProperty 只拦截单个属性：**
+
+```javascript
+// Proxy：自动监听所有属性（包括新增）
+const proxy = new Proxy({}, { get() {}, set() {} });
+proxy.newProp = 1;  // 自动被 set 拦截
+
+// defineProperty：需要预先定义
+const obj = {};
+Object.defineProperty(obj, 'name', { get() {}, set() {} });
+obj.newProp = 1;    // 不会被拦截
+```
+
+### Q2：为什么 handler.set 必须返回 true？
+
+**ECMAScript 规范要求：set 拦截器返回 false 时，严格模式下会抛出 TypeError：**
+
+```javascript
+new Proxy({}, {
+    set() { return false; }  // ❌ 严格模式报错
+});
+```
+
+### Q3：Proxy 能代理所有类型吗？
+
+**只能代理对象类型（包括数组、函数、Map、Set 等），不能代理基本类型：**
+
+```javascript
+new Proxy({} , {});     // ✅
+new Proxy([], {});      // ✅
+new Proxy(() => {}, {}); // ✅
+new Proxy(42, {});      // ❌ TypeError
+```
+
+---
+
+## 学习资源
+
+- [MDN - Proxy](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Proxy) ⭐ 官方权威
+- [MDN - Reflect](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Reflect)
+- [JavaScript.info - Proxy](https://zh.javascript.info/proxy)

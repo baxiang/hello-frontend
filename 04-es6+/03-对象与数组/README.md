@@ -1,6 +1,6 @@
 # 03-对象与数组
 
-> 解构、展开、Map/Set、Class
+> Map/Set、数组新方法、Class 类与继承
 
 ---
 
@@ -8,10 +8,6 @@
 
 | 文件 | 内容 |
 |------|------|
-| [03-解构与展开.md](./03-解构与展开.md) | 解构赋值、展开运算符 |
-| [05-Map-Set-WeakMap.md](./05-Map-Set-WeakMap.md) | 新数据结构 |
-| [06-数组与对象新方法.md](./06-数组与对象新方法.md) | 新增方法 |
-| [08-Class 类与继承.md](./08-Class%20类与继承.md) | 类语法、继承 |
-
----
-
+| [05-Map-Set-WeakMap](./05-Map-Set-WeakMap.md) | Map、Set、WeakMap、WeakSet |
+| [06-数组与对象新方法](./06-数组与对象新方法.md) | find、flat、Object.fromEntries、toSorted |
+| [08-Class 类与继承](./08-Class 类与继承.md) | class、extends、getter/setter、私有字段 |

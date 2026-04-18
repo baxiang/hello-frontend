@@ -1,6 +1,6 @@
 # 04-异步编程
 
-> Promise、async/await、生成器
+> 生成器、迭代器
 
 ---
 
@@ -8,8 +8,6 @@
 
 | 文件 | 内容 |
 |------|------|
-| [09-Promise-async-await.md](./09-Promise-async-await.md) | Promise、async/await |
-| [10-生成器与迭代器.md](./10-生成器与迭代器.md) | Generator、Iterator |
+| [10-生成器与迭代器](./10-生成器与迭代器.md) | Iterator 协议、Generator 函数、异步生成器 |
 
----
-
+> Promise 和 async/await 内容请参阅 `03-javascript/03-异步编程/03-异步编程.md`
