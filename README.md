@@ -1,6 +1,16 @@
 # 大前端技术学习路线
 
-> 完整的前端工程师成长路径：从入门到精通
+> 完整的前端工程师成长路径：从入门到精通（2026版）
+
+---
+
+## ⭐ 2026年必备三大技术
+
+| 技术 | 重要性 | 说明 |
+|------|--------|------|
+| **TypeScript** | ⭐⭐⭐ 必须 | 2026年项目标配，类型安全 |
+| **React/Vue** | ⭐⭐⭐ 必须 | 主流框架，组件开发核心 |
+| **Next.js/Nuxt.js** | ⭐⭐⭐ 推荐 | 元框架，SSR/SSG、全栈开发 |
 
 ---
 
@@ -15,8 +25,8 @@
 | 05 | [TypeScript](./05-typescript/) | 类型系统、接口、泛型 | ✅ |
 | 06 | [Node.js](./06-nodejs/) | 服务端开发、Express、数据库 | ✅ |
 | 07 | [工程化](./07-engineering/) | Webpack、Vite、ESLint、测试 | ✅ |
-| 08 | [React](./09-react/) | React 组件、Hooks、路由、状态管理 | ✅ |
-| 09 | [Vue](./10-vue/) | Vue 组件、Composition API、路由、状态管理 | ✅ |
+| 08 | [React](./08-react/) | React 组件、Hooks、路由、状态管理、Next.js | ✅ |
+| 09 | [Vue](./09-vue/) | Vue 组件、Composition API、路由、状态管理、Nuxt.js | ✅ |
 
 ---
 
@@ -48,9 +58,15 @@
 
 ### 第五阶段：框架学习（4-6 周）
 ```
-09-react/ 或 10-vue/
+08-react/ 或 09-vue/
 ```
 **目标：** 掌握主流前端框架，能够独立开发应用
+
+### 第六阶段：元框架学习（2-3 周）⭐ 新增
+```
+08-react/10-Next.js 元框架/ 或 09-vue/10-Nuxt.js 元框架/
+```
+**目标：** 掌握 SSR/SSG、全栈开发，达到生产项目能力
 
 ---
 
@@ -104,7 +120,7 @@ hello-frontend/
 │   ├── 02-构建工具/             # Webpack、Vite
 │   ├── 03-代码质量/             # ESLint、Prettier
 │   └── 04-测试工具/             # Jest、Vitest
-├── 09-react/                    # React 模块
+├── 08-react/                    # React 模块
 │   ├── 01-快速入门/             # React 简介、环境搭建
 │   ├── 02-核心概念/             # JSX、组件、Props、State
 │   ├── 03-Hooks 详解/           # useState、useEffect
@@ -114,8 +130,9 @@ hello-frontend/
 │   ├── 07-样式方案/             # CSS Modules、Styled Components
 │   ├── 08-性能优化/             # memo、useMemo
 │   ├── 09-测试/                 # Jest、Testing Library
-│   └── 10-实战项目/             # 完整项目
-└── 10-vue/                      # Vue 模块
+│   ├── 10-Next.js 元框架/       # ⭐ SSR、SSG、App Router
+│   └── 11-实战项目/             # Next.js 全栈项目
+└── 09-vue/                      # Vue 模块
     ├── 01-快速入门/             # Vue 简介、环境搭建
     ├── 02-核心概念/             # 响应式、computed、watch
     ├── 03-组件基础/             # Props、Events、Slots
@@ -125,7 +142,8 @@ hello-frontend/
     ├── 07-样式方案/             # Scoped CSS
     ├── 08-性能优化/             # 懒加载、虚拟滚动
     ├── 09-测试/                 # Vitest
-    └── 10-实战项目/             # 完整项目
+    ├── 10-Nuxt.js 元框架/       # ⭐ SSR、SSG、Auto-imports
+    └── 11-实战项目/             # Nuxt.js 全栈项目
 ```
 
 ---
@@ -166,10 +184,12 @@ hello-frontend/
 
 ### 官方文档
 - [MDN Web Docs](https://developer.mozilla.org/zh-CN/)
-- [TypeScript 官方文档](https://www.typescriptlang.org/zh/)
+- [TypeScript 官方文档](https://www.typescriptlang.org/zh/) ⭐ 必读
 - [Node.js 官方文档](https://nodejs.org/zh-cn/docs/)
-- [React 官方文档](https://react.dev/)
-- [Vue 官方文档](https://cn.vuejs.org/)
+- [React 官方文档](https://react.dev/) ⭐ 必读
+- [Vue 官方文档](https://cn.vuejs.org/) ⭐ 必读
+- [Next.js 官方文档](https://nextjs.org/docs) ⭐ 2026 必读
+- [Nuxt.js 官方文档](https://nuxt.com/) ⭐ 2026 必读
 
 ### 学习平台
 - [freeCodeCamp](https://www.freecodecamp.org/)
