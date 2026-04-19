@@ -50,30 +50,27 @@
 
 ## L1 理解层：会用
 
+### 什么是 TypeScript
+
+**一句话：TypeScript = JavaScript + 类型检查**
+
+```
+编译关系：
+
+┌─────────────────┐     编译      ┌─────────────────┐
+│   TypeScript   │ ──────────▶  │   JavaScript   │
+│   (.ts 文件)    │    tsc       │   (.js 文件)    │
+└─────────────────┘              └─────────────────┘
+```
+
 ### 类型注解
-
-**语法结构图：**
-
-```
-TypeScript 类型注解：
-
-let 变量名: 类型 = 值;
-         │
-         └─ 告诉 TypeScript 这个变量是什么类型
-
-基本类型:
-  string  → 字符串
-  number  → 数字
-  boolean → 布尔值
-  any     → 任意类型（不推荐）
-```
 
 **最简示例（1-3行）：**
 
 ```typescript
 let name: string = 'Tom';
 let age: number = 25;
-let active: boolean = true;
+function greet(name: string): string { return `Hello, ${name}!`; }
 ```
 
 **详细示例：**
@@ -82,86 +79,54 @@ let active: boolean = true;
 // 基础类型
 let message: string = 'Hello TypeScript';
 let count: number = 42;
-let price: number = 19.99;
 let isActive: boolean = true;
 
 // 数组
 let numbers: number[] = [1, 2, 3];
-let names: Array<string> = ['Tom', 'Jerry'];
 
-// 类型推断（可以省略标注）
-let inferred = '自动推断为 string';  // 等同于 let inferred: string = ...
+// 对象
+let user: { name: string; age: number } = { name: 'Tom', age: 25 };
 
-// 函数类型
+// 函数
 function add(a: number, b: number): number {
     return a + b;
 }
 
-// 对象类型
-let user: { name: string; age: number } = { name: 'Tom', age: 25 };
-```
-
----
-
-### 安装和运行
-
-**最简示例：**
-
-```bash
-npm install -g typescript
-tsc file.ts          # 编译为 .js
-node file.js         # 运行
-```
-
-**详细示例：**
-
-```bash
-# 安装
-npm install -g typescript
-
-# 检查版本
-tsc --version
-
-# 创建文件
-echo 'let name: string = "Tom";' > hello.ts
-
-# 编译（生成 hello.js）
-tsc hello.ts
-
-# 运行
-node hello.js
-
-# 或者直接运行（需要 ts-node）
-npx ts-node hello.ts
+// 类型推断（可以省略标注）
+let inferred = '自动推断为 string';  // 等同于 let inferred: string = ...
 ```
 
 ---
 
 ## L2 实践层：用好
 
-### 常见编译错误
+### JavaScript vs TypeScript 对比
 
-| 错误 | 原因 | 修复 |
-|------|------|------|
-| `Type 'string' is not assignable to type 'number'` | 类型不匹配 | 检查赋值类型 |
-| `Parameter 'x' implicitly has an 'any' type` | 缺少类型标注 | 添加 `x: number` |
-| `Property 'name' does not exist on type` | 访问了不存在的属性 | 检查对象类型定义 |
+| 特性 | JavaScript | TypeScript |
+|------|-----------|------------|
+| 类型检查 | 运行时 | 编译时 |
+| 错误发现 | 运行后 | 编写时 |
+| IDE 提示 | 基础 | 完整 |
+| 重构安全 | 低 | 高 |
+| 学习曲线 | 低 | 中 |
 
-### 反模式：不要这样做
+### 反模式
 
 ```typescript
 // ❌ 错误：滥用 any
-let data: any = fetchData();  // 失去了类型检查
+let data: any = fetchData();
+data.foo();  // 编译通过，运行时报错
 
 // ✅ 正确：定义具体类型
-interface User { id: number; name: string }
-let data: User = fetchData();
+interface Data { foo: string }
+let data: Data = fetchData();
+data.foo;  // 编译通过，运行也安全
 ```
 
 ### 适用场景
 
-| 场景 | 推荐方案 | 原因 |
-|------|---------|------|
+| 场景 | 推荐 | 原因 |
+|------|------|------|
 | 新项目 | TypeScript | 从一开始就有类型保护 |
 | 老项目迁移 | 渐进式添加 | 先用 `.ts` 扩展名，逐步加类型 |
 | 快速原型 | 类型推断 | 先写逻辑，后补类型 |
