@@ -213,4 +213,3 @@ let config: { port: number; host: string } = {
 ## 学习资源
 
 - [TypeScript 官方文档](https://www.typescriptlang.org/) ⭐ 官方权威
-- [TypeScript Playground](https://www.typescriptlang.org/play) - 在线练习

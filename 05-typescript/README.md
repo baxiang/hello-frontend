@@ -185,7 +185,7 @@ tsc --version
 ### ✅ 应该做的
 
 - 多动手写代码，不要只看不练
-- 善用 TypeScript Playground 在线练习
+- 在 VSCode 中创建 .ts 文件，用 npx tsc 编译验证
 - 阅读官方文档获取第一手资料
 - 完成每章的实践练习
 
@@ -203,7 +203,6 @@ tsc --version
 
 - [TypeScript 官方文档](https://www.typescriptlang.org/docs/)
 - [TypeScript 中文文档](https://www.typescriptlang.org/zh/docs/)
-- [TypeScript Playground](https://www.typescriptlang.org/play/)
 
 ### 在线练习
 
