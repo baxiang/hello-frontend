@@ -90,8 +90,8 @@ npx tsc --init    # 生成 tsconfig.json
 
 | 选项 | 用途 | 推荐值 |
 |------|------|--------|
-| `target` | 编译目标版本 | `ES2020` |
-| `module` | 模块系统 | `commonjs`(Node) / `ESNext`(前端) |
+| `target` | 编译目标版本 | `ES2022` |
+| `module` | 模块系统 | `NodeNext`(Node) / `ESNext`(前端) |
 | `strict` | 严格模式 | `true` |
 | `outDir` | 输出目录 | `./dist` |
 | `rootDir` | 源码目录 | `./src` |
@@ -101,6 +101,8 @@ npx tsc --init    # 生成 tsconfig.json
 | `declaration` | 生成 .d.ts | `true`(库项目) |
 | `sourceMap` | 生成 source map | `true` |
 
+> **2026 年推荐：** `target` 设为 `ES2022`（支持顶级 await），模块解析用 `NodeNext`（Node.js 项目）或 `bundler`（前端项目）。
+
 ### 项目配置示例
 
 **Node.js 项目：**
@@ -108,8 +110,8 @@ npx tsc --init    # 生成 tsconfig.json
 ```json
 {
     "compilerOptions": {
-        "target": "ES2020",
-        "module": "commonjs",
+        "target": "ES2022",
+        "module": "NodeNext",
         "strict": true,
         "outDir": "./dist",
         "rootDir": "./src",
@@ -129,7 +131,7 @@ npx tsc --init    # 生成 tsconfig.json
 ```json
 {
     "compilerOptions": {
-        "target": "ES2020",
+        "target": "ES2022",
         "module": "ESNext",
         "moduleResolution": "bundler",
         "strict": true,
@@ -158,8 +160,8 @@ npx tsc --init    # 生成 tsconfig.json
 // ❌ 错误：target 设置过低（不必要的兼容代码）
 { "target": "ES5" }
 
-// ✅ 正确：根据运行环境设置
-{ "target": "ES2020" }
+// ✅ 正确：2026 年推荐 ES2022+
+{ "target": "ES2022" }
 ```
 
 ---
