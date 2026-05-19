@@ -1,0 +1,31 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: 构建检查
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: 安装依赖
+        run: npm ci
+
+      - name: 构建站点
+        run: npm run docs:build
+
+      - name: 统计文档数量
+        run: |
+          echo "=== 文档统计 ==="
+          echo "Markdown 文件数：$(find . -name "*.md" -not -path "./node_modules/*" -not -path "./.vitepress/*" | wc -l)"
