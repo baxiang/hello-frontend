@@ -1,92 +1,25 @@
 import { generateSidebar } from 'vitepress-sidebar'
 
-export default generateSidebar([
-  {
-    documentRootPath: '/01-html5',
-    scanStartPath: '',
-    resolvePath: '/01-html5/',
+const modules = [
+  '01-html5',
+  '02-css3',
+  '03-javascript',
+  '04-es6+',
+  '05-typescript',
+  '06-nodejs',
+  '07-engineering',
+  '08-react',
+  '09-vue',
+  '10-nextjs',
+  '11-实战项目',
+]
+
+export default generateSidebar(
+  modules.map((mod) => ({
+    documentRootPath: `/${mod}`,
+    resolvePath: `/${mod}/`,
     useTitleFromFileHeading: true,
     collapsed: true,
     sortMenusOrderByDescending: false,
-  },
-  {
-    documentRootPath: '/02-css3',
-    scanStartPath: '',
-    resolvePath: '/02-css3/',
-    useTitleFromFileHeading: true,
-    collapsed: true,
-    sortMenusOrderByDescending: false,
-  },
-  {
-    documentRootPath: '/03-javascript',
-    scanStartPath: '',
-    resolvePath: '/03-javascript/',
-    useTitleFromFileHeading: true,
-    collapsed: true,
-    sortMenusOrderByDescending: false,
-  },
-  {
-    documentRootPath: '/04-es6+',
-    scanStartPath: '',
-    resolvePath: '/04-es6+/',
-    useTitleFromFileHeading: true,
-    collapsed: true,
-    sortMenusOrderByDescending: false,
-  },
-  {
-    documentRootPath: '/05-typescript',
-    scanStartPath: '',
-    resolvePath: '/05-typescript/',
-    useTitleFromFileHeading: true,
-    collapsed: true,
-    sortMenusOrderByDescending: false,
-  },
-  {
-    documentRootPath: '/06-nodejs',
-    scanStartPath: '',
-    resolvePath: '/06-nodejs/',
-    useTitleFromFileHeading: true,
-    collapsed: true,
-    sortMenusOrderByDescending: false,
-  },
-  {
-    documentRootPath: '/07-engineering',
-    scanStartPath: '',
-    resolvePath: '/07-engineering/',
-    useTitleFromFileHeading: true,
-    collapsed: true,
-    sortMenusOrderByDescending: false,
-  },
-  {
-    documentRootPath: '/08-react',
-    scanStartPath: '',
-    resolvePath: '/08-react/',
-    useTitleFromFileHeading: true,
-    collapsed: true,
-    sortMenusOrderByDescending: false,
-  },
-  {
-    documentRootPath: '/09-vue',
-    scanStartPath: '',
-    resolvePath: '/09-vue/',
-    useTitleFromFileHeading: true,
-    collapsed: true,
-    sortMenusOrderByDescending: false,
-  },
-  {
-    documentRootPath: '/10-nextjs',
-    scanStartPath: '',
-    resolvePath: '/10-nextjs/',
-    useTitleFromFileHeading: true,
-    collapsed: true,
-    sortMenusOrderByDescending: false,
-  },
-  {
-    documentRootPath: '/11-实战项目',
-    scanStartPath: '',
-    resolvePath: '/11-实战项目/',
-    useTitleFromFileHeading: true,
-    collapsed: true,
-    sortMenusOrderByDescending: false,
-  },
-])
+  }))
+)
