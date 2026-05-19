@@ -46,3 +46,7 @@ coverage/
 Thumbs.db
 .Spotlight-V100
 .Trashes
+
+# VitePress
+.vitepress/dist/
+.vitepress/cache/
