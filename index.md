@@ -3,7 +3,6 @@ layout: home
 
 hero:
   name: "大前端技术学习路线"
-  text: "从入门到进阶"
   tagline: 从零开始系统学习前端开发，完整工程师成长路径（2026版）
   actions:
     - theme: brand
